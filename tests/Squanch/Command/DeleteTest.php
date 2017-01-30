@@ -17,7 +17,7 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->cache = (new Config())->getImplementer();
+		$this->cache = (new Config())->getPlugin();
 	}
 	
 	

@@ -17,7 +17,8 @@ use Squid\MySql\Impl\Connectors\MySqlObjectConnector;
 
 class Config
 {
-	private $implementer;
+	/** @var IPlugin */
+	private $plugin;
 	
 	
 	private function initSquidInstance()
@@ -45,12 +46,12 @@ class Config
 			->setIgnoreFields(['Created', 'Modified']);
 		
 		
-		$implementer = new SquidPlugin($connector);
+		$plugin = new SquidPlugin($connector);
 		
 		$instance = new Instance();
 		$instance->Name = 'squid';
 		$instance->Type = InstanceType::HARD;
-		$instance->Plugin = $implementer;
+		$instance->Plugin = $plugin;
 		
 		return $instance;
 	}
@@ -85,14 +86,14 @@ class Config
 		$squanch = Squanch::skeleton(IBoot::class);
 		$squanch->setConfigLoader($configLoader);
 		
-		$this->implementer = $squanch->filterInstancesByName($instanceName)->getPlugin();
+		$this->plugin = $squanch->filterInstancesByName($instanceName)->getPlugin();
 	}
 	
 	/**
 	 * @return IPlugin;
 	 */
-	public function getImplementer()
+	public function getPlugin()
 	{
-		return $this->implementer;
+		return $this->plugin;
 	}
 }
