@@ -17,7 +17,7 @@ class Set extends AbstractSet implements ICmdSet
 	/** @var IMySqlObjectConnector */
 	private $connector;
 	
-	/** @var ICallbacksLoader  */
+	/** @var ICallbacksLoader */
 	private $callbacksLoader;
 	
 	private $key;
@@ -28,6 +28,7 @@ class Set extends AbstractSet implements ICmdSet
 	private function checkExists(): bool
 	{
 		$has = new Has($this->connector, $this->callbacksLoader);
+		
 		return $has->byKey($this->key)->execute();
 	}
 	
@@ -44,12 +45,28 @@ class Set extends AbstractSet implements ICmdSet
 		return ($exists && $this->isInsertOnly()) || (!$exists && $this->isUpdateOnly());
 	}
 	
+	private function onFailCallback(Data $data)
+	{
+		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, ['key' => $this->key, 'data' => $data]);
+	}
+	
+	private function onCompleteCallback(Data $data, bool $event)
+	{
+		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
+			'key' => $this->key, 'event' => $event ? Events::SUCCESS : Events::FAIL, 'data' => $data]);
+	}
+	
+	private function onSuccessCallback($data)
+	{
+		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, ['key' => $this->key, 'data' => $data]);
+	}
+	
 	
 	protected function getCallbacksLoader(): ICallbacksLoader
 	{
 		return $this->callbacksLoader;
 	}
-	
+
 	
 	public function __construct($connector, ICallbacksLoader $callbacksLoader)
 	{
@@ -61,18 +78,21 @@ class Set extends AbstractSet implements ICmdSet
 	public function setKey(string $key): ICmdSet
 	{
 		$this->key = $key;
+		
 		return $this;
 	}
 	
 	public function setData($data): ICmdSet
 	{
 		$this->data = $data;
+		
 		return $this;
 	}
 	
 	public function setTTL(int $ttl): ICmdSet
 	{
 		$this->ttl = $ttl;
+		
 		return $this;
 	}
 	
@@ -94,16 +114,26 @@ class Set extends AbstractSet implements ICmdSet
 			
 			if ($this->isInsertOrUpdateOnly($exists))
 			{
-				$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, ['key' => $this->key, 'data' => $data]);
+				$this->onFailCallback($data);
+				$this->onCompleteCallback($data, false);
 				$this->reset();
+				
 				return false;
 			}
 		}
 		
-		$this->connector->upsertByFields($data, ['Id']);
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, ['key' => $this->key, 'data' => $data]);
-		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
-			'key' => $this->key, 'event' => Events::SUCCESS, 'data' => $data]);
+		$result = $this->connector->upsertByFields($data, ['Id']);
+		
+		if ($result)
+		{
+			$this->onSuccessCallback($data);
+			$this->onCompleteCallback($data, true);
+		}
+		else
+		{
+			$this->onFailCallback($data);
+			$this->onCompleteCallback($data, false);
+		}
 		
 		$this->reset();
 		

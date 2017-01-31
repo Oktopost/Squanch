@@ -2,7 +2,7 @@
 namespace Squanch\Base\Boot;
 
 
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 
 
 interface IBoot
@@ -19,5 +19,5 @@ interface IBoot
 	
 	public function filterInstancesByPriority(int $priority): IBoot;
 	
-	public function getPlugin(): IPlugin;
+	public function getPlugin(): ICachePlugin;
 }

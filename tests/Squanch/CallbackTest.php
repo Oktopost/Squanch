@@ -2,7 +2,7 @@
 namespace Squanch;
 
 use Squanch\Base\ICallback;
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
@@ -13,7 +13,7 @@ require_once __DIR__.'/../dummyStorage/Config.php';
 
 class CallbackTest extends PHPUnit_Framework_TestCase
 {
-	/** @var IPlugin */
+	/** @var ICachePlugin */
 	private $cache;
 	
 	

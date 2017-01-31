@@ -70,10 +70,9 @@ class Has extends AbstractHas implements ICmdHas
 		
 		if ($result)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $this->key]);
 			$this->updateTTLIfNeed();
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $this->key]);
 			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, ['key' => $this->key, 'event' => Events::SUCCESS]);
-			
 		}
 		else
 		{

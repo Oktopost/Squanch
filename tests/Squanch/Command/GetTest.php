@@ -4,7 +4,7 @@ namespace Squanch\Command;
 use Objection\LiteObject;
 use Objection\LiteSetup;
 use PHPUnit_Framework_TestCase;
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use dummyStorage\Config;
 use Squanch\Objects\Data;
 
@@ -14,7 +14,7 @@ require_once __DIR__.'/../../dummyStorage/Config.php';
 
 class GetTest extends PHPUnit_Framework_TestCase
 {
-	/** @var IPlugin */
+	/** @var ICachePlugin */
 	private $cache;
 	
 	

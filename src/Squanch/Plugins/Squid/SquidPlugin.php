@@ -2,32 +2,32 @@
 namespace Squanch\Plugins\Squid;
 
 
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 
-use Squid\MySql\Connectors\IMySqlObjectConnector;
+use Squanch\Plugins\Squid\Base\ISquanchSquidConnector;
 
 
-class SquidPlugin implements IPlugin
+class SquidPlugin implements ICachePlugin
 {
-	/** @var IMySqlObjectConnector */
+	/** @var ISquanchSquidConnector */
 	private $connector;
 	
 	/** @var ICallbacksLoader */
 	private $callbacksLoader;
 	
 	
-	public function __construct(IMySqlObjectConnector $mysqlObjectConnector)
+	public function __construct(ISquanchSquidConnector $mysqlObjectConnector)
 	{
 		$this->connector = $mysqlObjectConnector;
 	}
 	
 	
-	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): IPlugin
+	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin
 	{
 		$this->callbacksLoader = $callbacksLoader;
 		return $this;

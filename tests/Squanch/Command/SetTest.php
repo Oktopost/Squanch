@@ -4,7 +4,7 @@ namespace Squanch\Command;
 
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Objects\Data;
 
 
@@ -13,7 +13,7 @@ require_once __DIR__.'/../../dummyStorage/Config.php';
 
 class SetTest extends PHPUnit_Framework_TestCase
 {
-	/** @var IPlugin */
+	/** @var ICachePlugin */
 	private $cache;
 	
 	
@@ -33,7 +33,18 @@ class SetTest extends PHPUnit_Framework_TestCase
 	public function test_onSetSuccess_return_true()
 	{
 		$result = false;
-		$this->cache->set('a', 'b')->onSuccess(function() use(&$result){
+		$this->cache->set(uniqid(), 'b')->onSuccess(function() use(&$result){
+			$result = true;
+		})->execute();
+		
+		self::assertTrue($result);
+	}
+	
+	public function test_onSetSuccess_on_update_reutrn_true()
+	{
+		$result = false;
+		$this->cache->set('a', 'b')->execute();
+		$this->cache->set('a', 'c')->onSuccess(function() use(&$result){
 			$result = true;
 		})->execute();
 		
@@ -86,6 +97,18 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$interval = Data::FOREVER_IN_SEC;
 		
 		self::assertLessThan(0, $result->TTL);
+		self::assertEquals($result->Modified->modify("+ {$interval} seconds"), $result->EndDate);
+	}
+	
+	public function test_setTTL_return_true()
+	{
+		$interval = 10;
+		$key = uniqid();
+		$this->cache->set($key, 'data')->setTTL($interval)->execute();
+		
+		$result = $this->cache->get($key)->asData();
+		
+		self::assertEquals($interval, $result->TTL);
 		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate);
 	}
 }

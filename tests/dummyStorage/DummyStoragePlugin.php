@@ -2,7 +2,7 @@
 namespace dummyStorage;
 
 
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Command\ICmdSet;
@@ -10,7 +10,7 @@ use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
-class DummyStoragePlugin implements IPlugin
+class DummyStoragePlugin implements ICachePlugin
 {
 	private $connector;
 	private $callbacksLoader;
@@ -22,7 +22,7 @@ class DummyStoragePlugin implements IPlugin
 	}
 	
 	
-	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): IPlugin
+	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin
 	{
 		$this->callbacksLoader = $callbacksLoader;
 		return $this;

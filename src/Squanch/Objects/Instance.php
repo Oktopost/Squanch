@@ -2,7 +2,7 @@
 namespace Squanch\Objects;
 
 
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Enum\InstanceType;
 use Squanch\Enum\InstancePriority;
 
@@ -14,7 +14,7 @@ use Objection\LiteSetup;
  * @property string $Name
  * @property string $Type
  * @property int $Priority
- * @property IPlugin $Plugin,
+ * @property ICachePlugin $Plugin,
  */
 class Instance extends LiteObject
 {
@@ -27,7 +27,7 @@ class Instance extends LiteObject
 			'Name'     => LiteSetup::createString(),
 			'Type'     => LiteSetup::createEnum(InstanceType::class),
 			'Priority' => LiteSetup::createInt(InstancePriority::MEDIUM),
-			'Plugin'   => LiteSetup::createInstanceOf(IPlugin::class),
+			'Plugin'   => LiteSetup::createInstanceOf(ICachePlugin::class),
 		];
 	}
 }

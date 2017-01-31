@@ -2,10 +2,12 @@
 namespace Squanch\Plugins\Squid;
 
 
+use Squanch\Plugins\Squid\Base\ISquanchSquidConnector;
+use Squid\MySql\Command\ICmdDelete;
 use Squid\MySql\Impl\Connectors\MySqlObjectConnector;
 
 
-class SquanchSquidConnector extends MySqlObjectConnector
+class SquanchSquidConnector extends MySqlObjectConnector implements ISquanchSquidConnector
 {
 	private $tableName;
 	
@@ -26,5 +28,10 @@ class SquanchSquidConnector extends MySqlObjectConnector
 		$this->createFilter($delete, $fields);
 		
 		return $delete->executeDml(true);
+	}
+	
+	public function cmdDelete(): ICmdDelete
+	{
+		return $this->getConnector()->delete()->from($this->tableName);
 	}
 }

@@ -46,7 +46,7 @@ class Delete extends AbstractDelete implements ICmdDelete
 	
 	public function execute(): bool
 	{
-		$result = $this->connector->deleteByFields(['Id' => $this->key], true);
+		$result = $this->connector->deleteByFields(['Id' => $this->key]);
 		
 		if ($result)
 		{

@@ -9,9 +9,9 @@ use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
-interface IPlugin
+interface ICachePlugin
 {
-	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): IPlugin;
+	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin;
 	
 	public function delete(string $key = null): ICmdDelete;
 	

@@ -2,7 +2,7 @@
 namespace Squanch\Boot;
 
 
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Base\Boot\IBoot;
 use Squanch\Base\Boot\IConfigLoader;
 
@@ -125,7 +125,7 @@ class Boot implements IBoot
 		return $this;
 	}
 	
-	public function getPlugin(): IPlugin
+	public function getPlugin(): ICachePlugin
 	{
 		$total = count($this->filteredInstances);
 		

@@ -5,7 +5,7 @@ namespace dummyStorage;
 use Squanch;
 use Squanch\Base\Boot\IBoot;
 use Squanch\Base\Boot\IConfigLoader;
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 use Squanch\Enum\InstancePriority;
 use Squanch\Enum\InstanceType;
 use Squanch\Objects\Data;
@@ -21,7 +21,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 class Config
 {
-	/** @var IPlugin */
+	/** @var ICachePlugin */
 	private $plugin;
 	
 	
@@ -56,6 +56,10 @@ class Config
 		$instance->Name = 'squid';
 		$instance->Type = InstanceType::HARD;
 		$instance->Plugin = $plugin;
+		
+		$garbageCollector = new Squanch\Plugins\Squid\SquidGarbageCollector($connector);
+		$forever = Data::FOREVER_IN_SEC;
+		$garbageCollector->run((object)['date' => (new \DateTime())->modify("+ {$forever} seconds")]);
 		
 		return $instance;
 	}
@@ -94,7 +98,7 @@ class Config
 	}
 	
 	/**
-	 * @return IPlugin;
+	 * @return ICachePlugin;
 	 */
 	public function getPlugin()
 	{

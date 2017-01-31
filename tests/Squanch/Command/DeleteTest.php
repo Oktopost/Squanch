@@ -4,7 +4,7 @@ namespace Squanch\Command;
 
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
-use Squanch\Base\IPlugin;
+use Squanch\Base\ICachePlugin;
 
 
 require_once __DIR__.'/../../dummyStorage/Config.php';
@@ -12,7 +12,7 @@ require_once __DIR__.'/../../dummyStorage/Config.php';
 
 class DeleteTest extends PHPUnit_Framework_TestCase
 {
-	/** @var IPlugin */
+	/** @var ICachePlugin */
 	private $cache;
 	
 	
