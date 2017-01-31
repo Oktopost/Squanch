@@ -19,7 +19,6 @@ class Squanch
 		self::$skeleton
 			->enableKnot()
 			->registerGlobalFor('Squanch')
-			->useGlobal()
 			->setConfigLoader(new PrefixDirectoryConfigLoader('Squanch', __DIR__ . '/../skeleton'));
 	}
 	
