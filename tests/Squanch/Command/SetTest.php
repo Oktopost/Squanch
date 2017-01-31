@@ -8,6 +8,9 @@ use Squanch\Base\IPlugin;
 use Squanch\Objects\Data;
 
 
+require_once __DIR__.'/../../dummyStorage/Config.php';
+
+
 class SetTest extends PHPUnit_Framework_TestCase
 {
 	/** @var IPlugin */

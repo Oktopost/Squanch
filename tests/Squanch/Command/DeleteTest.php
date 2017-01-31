@@ -2,10 +2,12 @@
 namespace Squanch\Command;
 
 
-
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
 use Squanch\Base\IPlugin;
+
+
+require_once __DIR__.'/../../dummyStorage/Config.php';
 
 
 class DeleteTest extends PHPUnit_Framework_TestCase

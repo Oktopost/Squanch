@@ -15,6 +15,10 @@ use Squid\MySql;
 use Squid\MySql\Impl\Connectors\MySqlObjectConnector;
 
 
+
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+
 class Config
 {
 	/** @var IPlugin */

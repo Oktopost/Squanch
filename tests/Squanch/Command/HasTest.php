@@ -7,6 +7,9 @@ use PHPUnit_Framework_TestCase;
 use Squanch\Base\IPlugin;
 
 
+require_once __DIR__.'/../../dummyStorage/Config.php';
+
+
 class HasTest extends PHPUnit_Framework_TestCase
 {
 	/** @var IPlugin */
