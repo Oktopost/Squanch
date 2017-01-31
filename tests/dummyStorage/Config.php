@@ -59,7 +59,8 @@ class Config
 		
 		$garbageCollector = new Squanch\Plugins\Squid\SquidGarbageCollector($connector);
 		$forever = Data::FOREVER_IN_SEC;
-		$garbageCollector->run((object)['date' => (new \DateTime())->modify("+ {$forever} seconds")]);
+		$garbageCollector->setEndDate((new \DateTime())->modify("+ {$forever} seconds"));
+		$garbageCollector->run();
 		
 		return $instance;
 	}
