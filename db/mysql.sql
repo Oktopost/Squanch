@@ -3,7 +3,7 @@ CREATE TABLE `HardCache` (
   `Value` text NOT NULL,
   `EndDate` datetime NOT NULL,
   `Created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `TTL` int(11) NOT NULL,
    PRIMARY KEY (`Id`),
    KEY `k_EndDate` (`EndDate`) USING BTREE
