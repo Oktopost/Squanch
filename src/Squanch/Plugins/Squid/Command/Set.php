@@ -27,7 +27,8 @@ class Set extends AbstractSet implements ICmdSet
 	
 	private function checkExists(): bool
 	{
-		return (bool)$this->connector->loadOneByField('Id', $this->key);
+		$has = new Has($this->connector, $this->callbacksLoader);
+		return $has->byKey($this->key)->execute();
 	}
 	
 	private function reset()
