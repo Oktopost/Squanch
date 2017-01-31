@@ -10,9 +10,9 @@ use Squanch\Enum\InstancePriority;
 use Squanch\Enum\InstanceType;
 use Squanch\Objects\Data;
 use Squanch\Objects\Instance;
+use Squanch\Plugins\Squid\SquanchSquidConnector;
 use Squanch\Plugins\Squid\SquidPlugin;
 use Squid\MySql;
-use Squid\MySql\Impl\Connectors\MySqlObjectConnector;
 
 
 
@@ -41,7 +41,7 @@ class Config
 			]);
 		
 		
-		$connector = new MySqlObjectConnector();
+		$connector = new SquanchSquidConnector();
 		
 		$connector
 			->setConnector($mysql->getConnector())
