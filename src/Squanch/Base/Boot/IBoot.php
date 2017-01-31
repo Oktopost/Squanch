@@ -9,6 +9,11 @@ interface IBoot
 {
 	public function setConfigLoader(IConfigLoader $configLoader): IBoot;
 	
+	/**
+	 * @return static
+	 */
+	public function resetFilters();
+	
 	public function filterInstancesByType(string $type): IBoot;
 	
 	public function filterInstancesByName(string $name): IBoot;

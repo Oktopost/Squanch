@@ -28,21 +28,11 @@ class Boot implements IBoot
 	private $filteredInstances;
 	
 	
-	private function loadInstances()
-	{
-		$this->filteredInstances = $this->config->getInstances();
-		
-		foreach ($this->filteredInstances as $instance)
-		{
-			$instance->Plugin->setCallbacksLoader($this->callbacksLoader);
-		}
-	}
-	
 	private function filterInstances(\Closure $compare)
 	{
 		if (is_null($this->filteredInstances))
 		{
-			$this->loadInstances();
+			$this->resetFilters();
 		}
 		
 		$instances = [];
@@ -58,6 +48,18 @@ class Boot implements IBoot
 		$this->filteredInstances = $instances;
 	}
 	
+	
+	public function resetFilters()
+	{
+		$this->filteredInstances = $this->config->getInstances();
+		
+		foreach ($this->filteredInstances as $instance)
+		{
+			$instance->Plugin->setCallbacksLoader($this->callbacksLoader);
+		}
+		
+		return $this;
+	}
 	
 	public function setConfigLoader(IConfigLoader $configLoader): IBoot
 	{
@@ -132,7 +134,7 @@ class Boot implements IBoot
 		if ($total == 0)
 		{
 			throw new SquanchInstanceException('Required instance not found');
-		} 
+		}
 		else if ($total > 1)
 		{
 			throw new SquanchInstanceException('Got multiple instances with same properties');
