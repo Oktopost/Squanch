@@ -60,7 +60,7 @@ class SquidGarbageCollector
 				break;
 			
 			$totalDeleted += $deleted;
-			time_nanosleep(0, 100);
+			time_nanosleep(0, 100000000);
 		}
 		
 		return $totalDeleted;
