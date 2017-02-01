@@ -1,7 +1,7 @@
 CREATE TABLE `HardCache` (
     `Id` varchar(255) NOT NULL,
     `Bucket` varchar(255) NOT NULL,
-    `Value` text NOT NULL,
+    `Value` longtext NOT NULL,
     `EndDate` datetime NOT NULL,
     `Created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
