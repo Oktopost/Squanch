@@ -1,5 +1,5 @@
 <?php
-namespace Squanch\Objects;
+namespace Squanch\Enum;
 
 
 use Objection\TEnum;
