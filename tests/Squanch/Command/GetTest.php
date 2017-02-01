@@ -56,11 +56,14 @@ class GetTest extends PHPUnit_Framework_TestCase
 	
 	public function test_asArray_return_array()
 	{
-		$this->cache->set('a', ['test'])->execute();
-		$get = $this->cache->get()->byKey('a')->asArray();
+		$key = uniqid();
+		$data = ['test'];
+		$this->cache->set($key, $data)->execute();
+		$get = $this->cache->get()->byKey($key)->asArray();
 
 		self::assertTrue(is_array($get));
-		$this->cache->delete('a')->execute();
+		self::assertEquals($data, $get);
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_as_Object_return_object()
@@ -71,6 +74,19 @@ class GetTest extends PHPUnit_Framework_TestCase
 		self::assertTrue(is_object($get));
 		self::assertEquals(1, $get->a);
 		$this->cache->delete('a')->execute();
+	}
+	
+	public function test_as_String_return_string()
+	{
+		$key = uniqId();
+		$string = 'Lorem ipsum';
+		
+		$this->cache->set($key, $string)->execute();
+		$result = $this->cache->get($key)->asString();
+		
+		self::assertTrue(is_string($result));
+		self::assertEquals($string, $result);
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_as_LiteObject_return_LiteObject()

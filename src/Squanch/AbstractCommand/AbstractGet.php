@@ -118,19 +118,4 @@ abstract class AbstractGet
 		
 		return $result;
 	}
-	
-	/**
-	 * @return int|float|bool
-	 */
-	public function asNumber()
-	{
-		if (!$this->executeIfNeed())
-			return false;
-		
-		$data = json_decode($this->asData()->Value);
-		$result = is_numeric($data) ? $data : false;
-		$this->afterExecute();
-		
-		return $result;
-	}
 }

@@ -117,6 +117,10 @@ class Set extends AbstractSet implements ICmdSet
 				
 			$data->Value = $mapper->getJson($this->data);
 		}
+		else if(is_scalar($this->data))
+		{
+			$data->Value = $this->data;
+		}
 		else
 		{
 			$data->Value = json_encode($this->data);

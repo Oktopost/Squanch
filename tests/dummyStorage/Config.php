@@ -57,11 +57,6 @@ class Config
 		$instance->Type = InstanceType::HARD;
 		$instance->Plugin = $plugin;
 		
-		$garbageCollector = new Squanch\Plugins\Squid\SquidGarbageCollector($connector);
-		$forever = Data::FOREVER_IN_SEC;
-		$garbageCollector->setEndDate((new \DateTime())->modify("+ {$forever} seconds"));
-		$garbageCollector->run();
-		
 		return $instance;
 	}
 	

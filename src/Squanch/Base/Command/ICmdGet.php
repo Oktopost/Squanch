@@ -30,11 +30,6 @@ interface ICmdGet extends IConstructWithConnectorAndCallbacksLoader, ICommand, I
 	public function asString();
 	
 	/**
-	 * @return int|float|bool
-	 */
-	public function asNumber();
-	
-	/**
 	 * @return Data|bool
 	 */
 	public function asData();
