@@ -94,8 +94,11 @@ abstract class AbstractGet
 		if (!$this->executeIfNeed())
 			return false;
 		
-		$result = Mapper::getObjectFrom($liteObjectName, $this->asData()->Value);
-
+		
+		$mapper = Mapper::createFor($liteObjectName);
+		
+		$result = $mapper->getObject($this->asArray(), $liteObjectName);
+		
 		$this->afterExecute();
 		
 		return $result;
@@ -109,8 +112,8 @@ abstract class AbstractGet
 		if (!$this->executeIfNeed())
 			return false;
 		
-		$data = json_decode($this->asData()->Value);
-		$result = is_string($data) ? $data : false;
+		$result = $this->asData()->Value;
+		
 		$this->afterExecute();
 		
 		return $result;

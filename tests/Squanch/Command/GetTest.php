@@ -80,16 +80,16 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$nested = new myOtherObject();
 		$nested->a = 'b';
 		$obj = new myObject();
-		$obj->some = 'string';
-		$obj->nested = $nested;
+		$obj->Some = 'string';
+		$obj->Nested = $nested;
 		
 		$this->cache->set($key, $obj)->execute();
 		
 		$get = $this->cache->get($key)->asLiteObject(myObject::class);
 		
 		self::assertInstanceOf(myObject::class, $get);
-		self::assertEquals($get->some, 'string');
-		self::assertEquals($get->nested->a, 'b');
+		self::assertEquals($get->Some, 'string');
+		self::assertEquals($get->Nested->a, 'b');
 		$this->cache->delete($key)->execute();
 	}
 }
@@ -99,8 +99,8 @@ class myObject extends LiteObject
 	protected function _setup()
 	{
 		return [
-			'some' => LiteSetup::createString(),
-			'nested' => LiteSetup::createInstanceOf(myOtherObject::class)
+			'Some' => LiteSetup::createString(),
+			'Nested' => LiteSetup::createInstanceOf(myOtherObject::class)
 		];
 	}
 }

@@ -13,7 +13,6 @@ use Squid\MySql\Connectors\IMySqlObjectConnector;
 
 use Objection\Mapper;
 use Objection\LiteObject;
-use Objection\Mapper\Mappers\JsonFieldsMapper;
 
 
 class Set extends AbstractSet implements ICmdSet
@@ -113,8 +112,7 @@ class Set extends AbstractSet implements ICmdSet
 		if ($this->data instanceof LiteObject)
 		{
 			$mapper = Mapper::createFor(
-				get_class($this->data), 
-				JsonFieldsMapper::instance($this->data->getPropertyNames())
+				get_class($this->data)
 			);
 				
 			$data->Value = $mapper->getJson($this->data);
