@@ -32,6 +32,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$get = $this->cache->get()->byKey('a')->asData();
 		
 		self::assertInstanceOf(Data::class, $get);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_get_by_key_return_false()
@@ -50,6 +51,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$updated = $this->cache->get()->byKey('a')->resetTTL(9999)->asData();
 		
 		self::assertTrue($updated->TTL === 9999);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_asArray_return_array()
@@ -58,6 +60,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$get = $this->cache->get()->byKey('a')->asArray();
 
 		self::assertTrue(is_array($get));
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_as_Object_return_object()
@@ -66,6 +69,8 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$get = $this->cache->get('a')->asObject();
 		
 		self::assertTrue(is_object($get));
+		self::assertEquals(1, $get->a);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_as_LiteObject_return_LiteObject()
@@ -76,6 +81,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$get = $this->cache->get('a')->asLiteObject(myObject::class);
 		
 		self::assertInstanceOf(myObject::class, $get);
+		$this->cache->delete('a')->execute();
 	}
 }
 

@@ -28,12 +28,14 @@ class CmdGet extends AbstractGet implements ICmdGet
 	private $executed = false;
 	
 	
-	protected function executeIfNeed()
+	protected function executeIfNeed(): bool
 	{
-		if ($this->executed == false)
+		if (!$this->executed)
 		{
-			$this->execute();
+			return $this->execute();
 		}
+		
+		return $this->executed;
 	}
 	
 	protected function getCallbacksLoader(): ICallbacksLoader

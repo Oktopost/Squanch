@@ -16,7 +16,7 @@ abstract class AbstractGet
 	
 	abstract protected function afterExecute();
 	
-	abstract protected function executeIfNeed();
+	abstract protected function executeIfNeed(): bool;
 	
 	
 	/**
@@ -60,7 +60,8 @@ abstract class AbstractGet
 	 */
 	public function asArray()
 	{
-		$this->executeIfNeed();
+		if (!$this->executeIfNeed())
+			return false;
 		
 		$data = json_decode($this->asData()->Value, true);
 		$result = is_array($data) ? $data: false;
@@ -74,7 +75,9 @@ abstract class AbstractGet
 	 */
 	public function asObject()
 	{
-		$this->executeIfNeed();
+		if (!$this->executeIfNeed())
+			return false;
+		
 		$data = json_decode($this->asData()->Value);
 		$result = is_object($data) ? $data: false;
 		$this->afterExecute();
@@ -87,7 +90,8 @@ abstract class AbstractGet
 	 */
 	public function asLiteObject(string $liteObjectName)
 	{
-		$this->executeIfNeed();
+		if (!$this->executeIfNeed())
+			return false;
 		
 		/** @var LiteObject $object */
 		$object = new $liteObjectName;
@@ -102,7 +106,9 @@ abstract class AbstractGet
 	 */
 	public function asString()
 	{
-		$this->executeIfNeed();
+		if (!$this->executeIfNeed())
+			return false;
+		
 		$data = json_decode($this->asData()->Value);
 		$result = is_string($data) ? $data : false;
 		$this->afterExecute();
@@ -115,7 +121,9 @@ abstract class AbstractGet
 	 */
 	public function asNumber()
 	{
-		$this->executeIfNeed();
+		if (!$this->executeIfNeed())
+			return false;
+		
 		$data = json_decode($this->asData()->Value);
 		$result = is_numeric($data) ? $data : false;
 		$this->afterExecute();

@@ -51,12 +51,14 @@ class Get extends AbstractGet implements ICmdGet
 		unset($this->key);
 	}
 	
-	protected function executeIfNeed()
+	protected function executeIfNeed(): bool
 	{
-		if ($this->executed == false)
+		if (!$this->executed)
 		{
-			$this->execute();
+			return $this->execute();
 		}
+		
+		return $this->executed;
 	}
 	
 

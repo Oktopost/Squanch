@@ -28,6 +28,7 @@ class HasTest extends PHPUnit_Framework_TestCase
 		$this->cache->set('a', 'b')->execute();
 		
 		self::assertTrue($this->cache->has('a')->execute());
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_has_return_false()
@@ -42,6 +43,7 @@ class HasTest extends PHPUnit_Framework_TestCase
 		
 		$data = $this->cache->get('a')->asData();
 		self::assertLessThanOrEqual(60, $data->TTL);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_onHasSuccess_return_true()
@@ -54,6 +56,7 @@ class HasTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_onHasFail_return_true()
@@ -75,5 +78,6 @@ class HasTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
 	}
 }

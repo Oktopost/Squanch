@@ -37,7 +37,7 @@ class Config
 				'port' => 3306,
 				'user' => 'root',
 				'password' => '',
-				'database' => 'squanch'
+				'database' => 'squanch_cache'
 			]);
 		
 		

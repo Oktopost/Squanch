@@ -28,16 +28,19 @@ class SetTest extends PHPUnit_Framework_TestCase
 	{
 		$set = $this->cache->set('a', 'b')->execute();
 		self::assertTrue($set);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_onSetSuccess_return_true()
 	{
+		$key = uniqid();
 		$result = false;
-		$this->cache->set(uniqid(), 'b')->onSuccess(function() use(&$result){
+		$this->cache->set($key, 'b')->onSuccess(function() use(&$result){
 			$result = true;
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_onSetSuccess_on_update_reutrn_true()
@@ -49,6 +52,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_onSetFail_return_true()
@@ -62,6 +66,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_onSet_return_true()
@@ -72,6 +77,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_insertOnly_failed_to_update()
@@ -80,12 +86,15 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$result = $this->cache->set('a', 'c')->insertOnly()->execute();
 		
 		self::assertFalse($result);
+		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_updateOnly_failed_to_insert()
 	{
-		$result = $this->cache->set(uniqid(), 'b')->updateOnly()->execute();
+		$key = uniqid();
+		$result = $this->cache->set($key, 'b')->updateOnly()->execute();
 		self::assertFalse($result);
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_setForever_return_true()
@@ -97,7 +106,8 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$interval = Data::FOREVER_IN_SEC;
 		
 		self::assertLessThan(0, $result->TTL);
-		self::assertEquals($result->Modified->modify("+ {$interval} seconds"), $result->EndDate);
+		self::assertEquals($result->Created->modify("+ {$interval} seconds"), $result->EndDate);
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_setTTL_return_true()
@@ -109,6 +119,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$result = $this->cache->get($key)->asData();
 		
 		self::assertEquals($interval, $result->TTL);
-		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate);
+		self::assertEquals($result->Created->modify("+ {$interval} seconds"), $result->EndDate);
+		$this->cache->delete($key)->execute();
 	}
 }
