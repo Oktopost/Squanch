@@ -2,12 +2,13 @@
 namespace Squanch\AbstractCommand;
 
 
-use Objection\LiteObject;
-
 use Squanch\Objects\Data;
 use Squanch\Base\ICallback;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Boot\ICallbacksLoader;
+
+use Objection\Mapper;
+use Objection\LiteObject;
 
 
 abstract class AbstractGet
@@ -93,12 +94,11 @@ abstract class AbstractGet
 		if (!$this->executeIfNeed())
 			return false;
 		
-		/** @var LiteObject $object */
-		$object = new $liteObjectName;
-		$object->fromArray($this->asArray());
+		$result = Mapper::getObjectFrom($liteObjectName, $this->asData()->Value);
+
 		$this->afterExecute();
 		
-		return $object;
+		return $result;
 	}
 	
 	/**

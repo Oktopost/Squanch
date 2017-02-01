@@ -11,6 +11,10 @@ use Squanch\AbstractCommand\AbstractSet;
 
 use Squid\MySql\Connectors\IMySqlObjectConnector;
 
+use Objection\Mapper;
+use Objection\LiteObject;
+use Objection\Mapper\Mappers\JsonFieldsMapper;
+
 
 class Set extends AbstractSet implements ICmdSet
 {
@@ -105,7 +109,21 @@ class Set extends AbstractSet implements ICmdSet
 	{
 		$data = new Data();
 		$data->Id = $this->key;
-		$data->Value = json_encode($this->data);
+		
+		if ($this->data instanceof LiteObject)
+		{
+			$mapper = Mapper::createFor(
+				get_class($this->data), 
+				JsonFieldsMapper::instance($this->data->getPropertyNames())
+			);
+				
+			$data->Value = $mapper->getJson($this->data);
+		}
+		else
+		{
+			$data->Value = json_encode($this->data);
+		}
+		
 		$data->setTTL($this->ttl);
 		
 		if ($this->isInsertOnly() || $this->isUpdateOnly())
