@@ -3,8 +3,9 @@ namespace Squanch\AbstractCommand;
 
 
 use Squanch\Objects\Data;
-use Squanch\Base\ICallback;
+use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
+use Squanch\Base\ICallback;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 use Objection\Mapper;
@@ -13,6 +14,10 @@ use Objection\LiteObject;
 
 abstract class AbstractGet
 {
+	private $key;
+	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
+	
+	
 	abstract protected function getCallbacksLoader(): ICallbacksLoader;
 	
 	abstract protected function afterExecute();
@@ -24,7 +29,44 @@ abstract class AbstractGet
 	 * @return Data|bool
 	 */
 	abstract public function asData();
+
 	
+	
+	protected function reset()
+	{
+		unset($this->key);
+		$this->bucket = Bucket::DEFAULT_BUCKET_NAME;
+	}
+	
+	
+	protected function getBucket(): string
+	{
+		return $this->bucket;
+	}
+	
+	protected function getKey(): string
+	{
+		return $this->key;
+	}
+	
+	
+	/**
+	 * @return static
+	 */
+	public function byBucket(string $bucket)
+	{
+		$this->bucket = $bucket;
+		return $this;
+	}
+	
+	/**
+	 * @return static
+	 */
+	public function byKey(string $key)
+	{
+		$this->key = $key;
+		return $this;
+	}
 	
 	/**
 	 * @param \Closure|ICallback $onSuccess

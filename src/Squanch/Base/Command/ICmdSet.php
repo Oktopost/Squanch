@@ -4,13 +4,30 @@ namespace Squanch\Base\Command;
 
 interface ICmdSet extends IConstructWithConnectorAndCallbacksLoader, ICommand
 {
-	public function setKey(string $key): ICmdSet;
+	/**
+	 * @return static
+	 */
+	public function setBucket(string $bucket);
 	
-	public function setData($data): ICmdSet;
+	/**
+	 * @return static
+	 */
+	public function setKey(string $key);
 	
-	public function setTTL(int $ttl): ICmdSet;
+	/**
+	 * @return static
+	 */
+	public function setData($data);
 	
-	public function setForever(): ICmdSet;
+	/**
+	 * @return static
+	 */
+	public function setTTL(int $ttl);
+	
+	/**
+	 * @return static
+	 */
+	public function setForever();
 	
 	/**
 	 * @return static

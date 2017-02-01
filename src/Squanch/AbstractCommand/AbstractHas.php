@@ -2,14 +2,55 @@
 namespace Squanch\AbstractCommand;
 
 
-use Squanch\Base\ICallback;
+use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
+use Squanch\Base\ICallback;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
 abstract class AbstractHas
 {
+	private $key;
+	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
+	
+	
 	abstract protected function getCallbacksLoader(): ICallbacksLoader;
+	
+	
+	protected function reset()
+	{
+		unset($this->key);
+		$this->bucket = Bucket::DEFAULT_BUCKET_NAME;
+	}	
+	
+	protected function getBucket(): string
+	{
+		return $this->bucket;
+	}
+	
+	protected function getKey(): string
+	{
+		return $this->key;
+	}
+	
+	
+	/**
+	 * @return static
+	 */
+	public function byBucket(string $bucket)
+	{
+		$this->bucket = $bucket;
+		return $this;
+	}
+	
+	/**
+	 * @return static
+	 */
+	public function byKey(string $key)
+	{
+		$this->key = $key;
+		return $this;
+	}
 	
 	
 	/**

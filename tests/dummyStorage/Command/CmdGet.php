@@ -6,7 +6,6 @@ use Squanch\Enum\Events;
 use Squanch\Objects\Data;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Boot\ICallbacksLoader;
-use Squanch\Base\Command\IByKey;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\AbstractCommand\AbstractGet;
 
@@ -23,7 +22,6 @@ class CmdGet extends AbstractGet implements ICmdGet
 	
 	/** @var Data */
 	private $data;
-	private $key;
 	private $newTTL;
 	private $executed = false;
 	
@@ -46,6 +44,7 @@ class CmdGet extends AbstractGet implements ICmdGet
 	protected function afterExecute()
 	{
 		$this->executed = false;
+		$this->reset();
 	}
 
 	
@@ -55,13 +54,6 @@ class CmdGet extends AbstractGet implements ICmdGet
 		$this->callbacksLoader = $callbacksLoader;
 	}
 	
-	
-	public function byKey(string $key): IByKey
-	{
-		$this->key = $key;
-		
-		return $this;
-	}
 	
 	public function resetTTL(int $ttl)
 	{
@@ -73,14 +65,16 @@ class CmdGet extends AbstractGet implements ICmdGet
 	public function execute(): bool
 	{
 		$this->executed = false;
-		$key = $this->key;
-		unset($this->key);
+		$bucket = $this->getBucket();
+		$key = $bucket.$this->getKey();
 		
 		$db = $this->connector->getDb();
 		
-		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()))
+		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, ['key' => $key, 'data' => $db[$key]]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, [
+				'key' => $key, 'bucket' => $bucket, 'data' => $db[$key]]
+			);
 			
 			/** @var Data $data */
 			$data = $db[$key];
@@ -96,18 +90,19 @@ class CmdGet extends AbstractGet implements ICmdGet
 			$this->data = $data;
 			$this->executed = true;
 			$this->callbacksLoader->executeCallback(Callbacks::ON_GET,
-				['key' => $key, 'event' => Events::SUCCESS, 'data' => $db[$key]]);
+				['key' => $key, 'bucket' => $bucket, 'event' => Events::SUCCESS, 'data' => $db[$key]]);
 			
 			return true;
 		}
 		else
 		{
 			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, [
-				'key' => $key
+				'key' => $key,
+				'bucket' => $bucket
 			]);
 			
 			$this->callbacksLoader->executeCallback(Callbacks::ON_GET,
-				['key' => $key, 'event' => Events::FAIL]);
+				['key' => $key, 'bucket' => $bucket, 'event' => Events::FAIL]);
 			
 			return false;
 		}

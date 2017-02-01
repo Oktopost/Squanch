@@ -15,4 +15,7 @@ class TTL
 	const ONE_DAY      = self::TWELVE_HOURS * 2;
 	const ONE_WEEK     = self::ONE_DAY * 7;
 	const ONE_YEAR     = self::ONE_DAY * 365;
+	
+	const FOREVER      = self::ONE_YEAR * 100;
+	const DEFAULT_TTL  = self::ONE_HOUR;
 }

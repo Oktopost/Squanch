@@ -5,21 +5,21 @@ namespace Squanch\Objects;
 use Objection\LiteObject;
 use Objection\LiteSetup;
 
+use Squanch\Enum\TTL;
+use Squanch\Enum\Bucket;
+
 
 /**
  * @property string $Id
+ * @property string $Bucket
  * @property string $Value
+ * @property int $TTL
  * @property \DateTime $EndDate
  * @property \DateTime $Created
  * @property \DateTime $Modified
- * @property int $TTL
  */
 class Data extends LiteObject
 {
-	const FOREVER_IN_SEC     = 60 * 60 * 24 * 365 * 100;
-	const DEFAULT_TTL_IS_SEC = 60 * 60;
-	
-	
 	/**
 	 * @return array
 	 */
@@ -27,11 +27,12 @@ class Data extends LiteObject
 	{
 		return [
 			'Id'       => LiteSetup::createString(),
+			'Bucket'   => LiteSetup::createString(Bucket::DEFAULT_BUCKET_NAME),
 			'Value'    => LiteSetup::createString(),
+			'TTL'      => LiteSetup::createInt(TTL::DEFAULT_TTL),
 			'EndDate'  => LiteSetup::createDateTime(),
 			'Created'  => LiteSetup::createDateTime(),
-			'Modified' => LiteSetup::createDateTime(),
-			'TTL'      => LiteSetup::createInt(self::DEFAULT_TTL_IS_SEC)
+			'Modified' => LiteSetup::createDateTime()
 		];
 	}
 	
@@ -40,12 +41,12 @@ class Data extends LiteObject
 	{
 		if (!is_int($newTTL))
 		{
-			$newTTL = self::DEFAULT_TTL_IS_SEC;
+			$newTTL = TTL::DEFAULT_TTL;
 		}
 		
 		if ($newTTL < 0)
 		{
-			$interval = self::FOREVER_IN_SEC;
+			$interval = TTL::FOREVER;
 		}
 		else if ($newTTL == 0)
 		{

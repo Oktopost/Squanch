@@ -5,7 +5,6 @@ namespace dummyStorage\Command;
 use Squanch\Enum\Events;
 use Squanch\Objects\Data;
 use Squanch\Enum\Callbacks;
-use Squanch\Base\Command\IByKey;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractHas;
@@ -20,7 +19,6 @@ class CmdHas extends AbstractHas implements ICmdHas
 	
 	/** @var ICallbacksLoader */
 	private $callbacksLoader;
-	private $key;
 	private $newTTL;
 	
 	
@@ -37,22 +35,16 @@ class CmdHas extends AbstractHas implements ICmdHas
 	}
 	
 	
-	public function byKey(string $key): IByKey
-	{
-		$this->key = $key;
-		return $this;
-	}
-	
 	public function execute(): bool
 	{
-		$key = $this->key;
-		unset($this->key);
+		$bucket = $this->getBucket();
+		$key = $bucket.$this->getKey();
 		
 		$db = $this->connector->getDB();
 		
-		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()))
+		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $key]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $key, 'bucket' => $bucket]);
 			
 			/** @var Data $item */
 			$item = $db[$key];
@@ -65,15 +57,20 @@ class CmdHas extends AbstractHas implements ICmdHas
 				unset($this->newTTL);
 			}
 			
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, ['key' => $key, 'event' => Events::SUCCESS]);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
+				'key' => $key, 'bucket' => $bucket, 'event' => Events::SUCCESS]
+			);
 			
+			$this->reset();
 			return true;
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, ['key' => $key]);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, ['key' => $key, 'event' => Events::FAIL]);
-			
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, ['key' => $key, 'bucket' => $bucket]);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
+				'key' => $key, 'bucket' => $bucket, 'event' => Events::FAIL]
+			);
+			$this->reset();
 			return false;
 		}
 	}

@@ -19,17 +19,18 @@ class Has extends AbstractHas implements ICmdHas
 	
 	/** @var ICallbacksLoader  */
 	private $callbacksLoader;
-	private $key;
 	private $newTTL;
 	
 	private function updateTTLIfNeed()
 	{
 		if ($this->newTTL)
 		{
+			$get = new Get($this->connector, $this->getCallbacksLoader());
+			
 			/** @var Data $object */
-			$object = $this->connector->loadOneByField('Id', $this->key);
+			$object = $get->byKey($this->getKey())->byBucket($this->getBucket())->asData();
 			$object->setTTL($this->newTTL);
-			$this->connector->upsertByFields($object, ['Id']);
+			$this->connector->upsertByFields($object, ['Id', 'Bucket']);
 			
 			unset($this->newTTL);
 		}
@@ -49,19 +50,10 @@ class Has extends AbstractHas implements ICmdHas
 	}
 	
 	
-	/**
-	 * @return static
-	 */
-	public function byKey(string $key)
-	{
-		$this->key = $key;
-		return $this;
-	}
-	
 	public function execute(): bool
 	{
 		/** @var Data $result */
-		$result = $this->connector->loadOneByField('Id', $this->key);
+		$result = $this->connector->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
 		if ($result)
 		{
@@ -71,15 +63,26 @@ class Has extends AbstractHas implements ICmdHas
 		if ($result)
 		{
 			$this->updateTTLIfNeed();
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $this->key]);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, ['key' => $this->key, 'event' => Events::SUCCESS]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, [
+				'key' => $this->getKey(), 'bucket' => $this->getBucket()]
+			);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
+				'key' => $this->getKey(), 'bucket' => $this->getBucket(), 'event' => Events::SUCCESS]
+			);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, ['key' => $this->key]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, [
+				'key' => $this->getKey(),
+				'bucket' => $this->getBucket(),
+			]);
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, ['key' => $this->key, 'event' => Events::FAIL]);
+		$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
+			'key' => $this->getKey(),
+			'bucket' => $this->getBucket(),
+			'event' => Events::FAIL
+		]);
 		
 		return $result;
 	}

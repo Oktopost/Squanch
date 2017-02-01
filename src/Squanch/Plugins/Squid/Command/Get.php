@@ -23,7 +23,6 @@ class Get extends AbstractGet implements ICmdGet
 	/** @var Data */
 	private $data;
 	
-	private $key;
 	private $newTTL;
 	private $executed = false;
 	
@@ -48,7 +47,7 @@ class Get extends AbstractGet implements ICmdGet
 	{
 		$this->executed = false;
 		unset($this->newTTL);
-		unset($this->key);
+		$this->reset();
 	}
 	
 	protected function executeIfNeed(): bool
@@ -70,16 +69,6 @@ class Get extends AbstractGet implements ICmdGet
 	
 	
 	/**
-	 * @return static
-	 */
-	public function byKey(string $key)
-	{
-		$this->key = $key;
-		
-		return $this;
-	}
-	
-	/**
 	 * @return Data|bool
 	 */
 	public function asData()
@@ -93,25 +82,31 @@ class Get extends AbstractGet implements ICmdGet
 	{
 		$result = false;
 		
-		$this->data = $this->connector->loadOneByField('Id', $this->key);
+		$this->data = $this->connector->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
 		if ($this->data && $this->data->EndDate > new \DateTime())
 		{
 			$result = true;
 			
 			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET,
-				['key' => $this->key, 'data' => $this->data]);
+				['key' => $this->getKey(), 'bucket' => $this->getBucket(), 'data' => $this->data]);
 			
 			$this->updateTTLIfNeed();
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, ['key' => $this->key]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, [
+				'key' => $this->getKey(),
+				'bucket' => $this->getBucket()
+			]);
 			$this->data = null;
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_GET,
-			['key' => $this->key, 'event' => $result ? Events::SUCCESS : Events::FAIL]
+		$this->callbacksLoader->executeCallback(Callbacks::ON_GET, [
+			'key' => $this->getKey(), 
+			'bucket' => $this->getBucket(), 
+			'event' => $result ? Events::SUCCESS : Events::FAIL
+			]
 		);
 		
 		

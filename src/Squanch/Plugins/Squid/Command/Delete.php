@@ -19,8 +19,6 @@ class Delete extends AbstractDelete implements ICmdDelete
 	/** @var ICallbacksLoader  */
 	private $callbacksLoader;
 	
-	private $key;
-	
 	
 	protected function getCallbacksLoader(): ICallbacksLoader
 	{
@@ -35,34 +33,32 @@ class Delete extends AbstractDelete implements ICmdDelete
 	}
 	
 	
-	/**
-	 * @return static
-	 */
-	public function byKey(string $key)
-	{
-		$this->key = $key;
-		return $this;
-	}
-	
 	public function execute(): bool
 	{
-		$result = $this->connector->deleteByFields(['Id' => $this->key]);
+		$result = $this->connector->deleteByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
 		if ($result)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, ['key' => $this->key]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, [
+				'key' => $this->getKey(),
+				'bucket' => $this->getBucket()
+			]);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_DELETE, ['key' => $this->key]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_DELETE, [
+				'key' => $this->getKey(),
+				'bucket' => $this->getBucket()
+			]);
 		}
 		
 		$this->callbacksLoader->executeCallback(Callbacks::ON_DELETE, [
-			'key' => $this->key, 
+			'key' => $this->getKey(),
+			'bucket' => $this->getBucket(),
 			'event' => ($result ? Events::SUCCESS : Events::FAIL)
 		]);
 		
-		unset($this->key);
+		$this->reset();
 		
 		return $result;
 	}

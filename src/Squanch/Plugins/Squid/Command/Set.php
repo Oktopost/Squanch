@@ -23,24 +23,12 @@ class Set extends AbstractSet implements ICmdSet
 	/** @var ICallbacksLoader */
 	private $callbacksLoader;
 	
-	private $key;
-	private $data;
-	private $ttl;
-	
 	
 	private function checkExists(): bool
 	{
 		$has = new Has($this->connector, $this->callbacksLoader);
 		
-		return $has->byKey($this->key)->execute();
-	}
-	
-	private function reset()
-	{
-		unset($this->data);
-		unset($this->key);
-		unset($this->ttl);
-		$this->resetInsertAndUpdateOnly();
+		return $has->byKey($this->getKey())->byBucket($this->getBucket())->execute();
 	}
 	
 	private function isInsertOrUpdateOnly($exists): bool
@@ -50,18 +38,30 @@ class Set extends AbstractSet implements ICmdSet
 	
 	private function onFailCallback(Data $data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, ['key' => $this->key, 'data' => $data]);
+		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, [
+			'key' => $this->getKey(),
+			'bucket' => $this->getBucket(),
+			'data' => $data
+		]);
 	}
 	
 	private function onCompleteCallback(Data $data, bool $event)
 	{
 		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
-			'key' => $this->key, 'event' => $event ? Events::SUCCESS : Events::FAIL, 'data' => $data]);
+			'key' => $this->getKey(),
+			'bucket' => $this->getBucket(),
+			'event' => $event ? Events::SUCCESS : Events::FAIL, 
+			'data' => $data
+		]);
 	}
 	
 	private function onSuccessCallback($data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, ['key' => $this->key, 'data' => $data]);
+		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, [
+			'key' => $this->getKey(), 
+			'bucket' => $this->getBucket(),
+			'data' => $data
+		]);
 	}
 	
 	
@@ -77,56 +77,30 @@ class Set extends AbstractSet implements ICmdSet
 		$this->callbacksLoader = $callbacksLoader;
 	}
 	
-	
-	public function setKey(string $key): ICmdSet
-	{
-		$this->key = $key;
-		
-		return $this;
-	}
-	
-	public function setData($data): ICmdSet
-	{
-		$this->data = $data;
-		
-		return $this;
-	}
-	
-	public function setTTL(int $ttl): ICmdSet
-	{
-		$this->ttl = $ttl;
-		
-		return $this;
-	}
-	
-	public function setForever(): ICmdSet
-	{
-		return $this->setTTL(-1);
-	}
-	
 	public function execute(): bool
 	{
 		$data = new Data();
-		$data->Id = $this->key;
+		$data->Id = $this->getKey();
+		$data->Bucket = $this->getBucket();
 		
-		if ($this->data instanceof LiteObject)
+		if ($this->getData() instanceof LiteObject)
 		{
 			$mapper = Mapper::createFor(
-				get_class($this->data)
+				get_class($this->getData())
 			);
 				
-			$data->Value = $mapper->getJson($this->data);
+			$data->Value = $mapper->getJson($this->getData());
 		}
-		else if(is_scalar($this->data))
+		else if(is_scalar($this->getData()))
 		{
-			$data->Value = $this->data;
+			$data->Value = $this->getData();
 		}
 		else
 		{
-			$data->Value = json_encode($this->data);
+			$data->Value = json_encode($this->getData());
 		}
 		
-		$data->setTTL($this->ttl);
+		$data->setTTL($this->getTTL());
 		
 		if ($this->isInsertOnly() || $this->isUpdateOnly())
 		{
@@ -142,7 +116,7 @@ class Set extends AbstractSet implements ICmdSet
 			}
 		}
 		
-		$result = $this->connector->upsertByFields($data, ['Id']);
+		$result = $this->connector->upsertByFields($data, ['Id', 'Bucket']);
 		
 		if ($result)
 		{

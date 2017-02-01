@@ -4,7 +4,6 @@ namespace dummyStorage\Command;
 
 use Squanch\Enum\Events;
 use Squanch\Enum\Callbacks;
-use Squanch\Base\Command\IByKey;
 use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractDelete;
@@ -16,8 +15,8 @@ class CmdDelete extends AbstractDelete implements ICmdDelete
 {
 	/** @var DummyConnector */
 	private $connector;
-	private $key;
 	
+	/** @var ICallbacksLoader  */
 	private $callbacksLoader;
 	
 	
@@ -33,35 +32,30 @@ class CmdDelete extends AbstractDelete implements ICmdDelete
 		$this->callbacksLoader = $callbacksLoader;
 	}
 	
-	public function byKey(string $key): IByKey
-	{
-		$this->key = $key;
-		
-		return $this;
-	}
-	
 	public function execute(): bool
 	{
 		$result = false;
-		$key = $this->key;
-		unset($this->key);
+		$bucket = $this->getBucket();
+		$key = $bucket . $this->getKey();
 		
 		$db = $this->connector->getDb();
 		
-		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()))
+		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
 			unset($db[$key]);
 			$this->connector->setDb($db);
 			$result = true;
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, ['key' => $key]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, ['key' => $key, 'bucket' => $bucket]);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_DELETE, ['key' => $key]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_DELETE, ['key' => $key, 'bucket' => $bucket,]);
 		}
 		
 		$this->callbacksLoader->executeCallback(Callbacks::ON_DELETE, [
-			'key' => $key, 'event' => $result ? Events::SUCCESS : Events::FAIL]);
+			'key' => $key, 'bucket' => $bucket, 'event' => $result ? Events::SUCCESS : Events::FAIL]);
+		
+		$this->reset();
 		
 		return $result;
 	}

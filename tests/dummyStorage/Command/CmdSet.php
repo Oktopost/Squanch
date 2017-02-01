@@ -22,21 +22,6 @@ class CmdSet extends AbstractSet implements ICmdSet
 	
 	/** @var ICallbacksLoader */
 	private $callbacksLoader;
-	private $data;
-	private $key;
-	private $ttl;
-	private $insertOnly;
-	private $updateOnly;
-	
-	
-	private function reset()
-	{
-		unset($this->data);
-		unset($this->key);
-		unset($this->ttl);
-		unset($this->insertOnly);
-		unset($this->updateOnly);
-	}
 	
 	
 	protected function getCallbacksLoader(): ICallbacksLoader
@@ -51,82 +36,61 @@ class CmdSet extends AbstractSet implements ICmdSet
 		$this->callbacksLoader = $callbacksLoader;
 	}
 	
-	public function setKey(string $key): ICmdSet
-	{
-		$this->key = $key;
-		
-		return $this;
-	}
-	
-	public function setData($data): ICmdSet
-	{
-		$this->data = $data;
-		
-		return $this;
-	}
-	
-	public function setTTL(int $ttl): ICmdSet
-	{
-		$this->ttl = $ttl;
-		
-		return $this;
-	}
-	
-	public function setForever(): ICmdSet
-	{
-		$this->ttl = -1;
-		
-		return $this;
-	}
 	
 	public function execute(): bool
 	{
 		$db = $this->connector->getDb();
-		$key = $this->key;
-		$exists = isset($db[$key]) && $db[$key]->EndDate > (new \DateTime());
+		$bucket = $this->getBucket();
+		$key = $bucket . $this->getKey();
+		$exists = isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket;
 		
 		$data = new Data();
-		$data->Id = $this->key;
+		$data->Id = $key;
+		$data->Bucket = $bucket;
 		
-		if ($this->data instanceof LiteObject)
+		if ($this->getData() instanceof LiteObject)
 		{
 			$mapper = Mapper::createFor(
-				get_class($this->data)
+				get_class($this->getData())
 			);
 			
-			$data->Value = $mapper->getJson($this->data);
+			$data->Value = $mapper->getJson($this->getData());
 		}
-		else if(is_scalar($this->data))
+		else if(is_scalar($this->getData()))
 		{
-			$data->Value = $this->data;
+			$data->Value = $this->getData();
 		}
 		else
 		{
-			$data->Value = json_encode($this->data);
+			$data->Value = json_encode($this->getData());
 		}
 		
-		$data->setTTL($this->ttl);
+		$data->setTTL($this->getTTL());
 		
 		if (
 			($exists && $this->isInsertOnly()) ||
 			(!$exists && $this->isUpdateOnly())
 		)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, ['key' => $this->key, 'data' => $data]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, [
+				'key' => $key, 'bucket' => $bucket, 'data' => $data]
+			);
 			
 			$this->reset();
 			
 			return false;
 		}
 		
-		$db[$this->key] = $data;
+		$db[$key] = $data;
 		$this->connector->setDb($db);
 		
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, ['key' => $this->key, 'data' => $data]);
+		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, [
+			'key' => $key, 'bucket' => $bucket, 'data' => $data]
+		);
 		
 		
 		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
-			'key' => $this->key, 'event' => Events::SUCCESS, 'data' => $data]);
+			'key' => $this->getKey(), 'bucket' => $bucket, 'event' => Events::SUCCESS, 'data' => $data]);
 		
 		$this->reset();
 		

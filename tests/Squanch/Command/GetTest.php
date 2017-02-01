@@ -108,6 +108,22 @@ class GetTest extends PHPUnit_Framework_TestCase
 		self::assertEquals($get->Nested->a, 'b');
 		$this->cache->delete($key)->execute();
 	}
+	
+	public function test_use_two_buckets()
+	{
+		$key = uniqid();
+		$this->cache->set($key, 'a', 'b')->insertOnly()->execute();
+		$this->cache->set($key, 'c', 'd')->insertOnly()->execute();
+		
+		$getA = $this->cache->get($key, 'b')->asString();
+		$getB = $this->cache->get($key, 'd')->asString();
+		
+		self::assertEquals('a', $getA);
+		self::assertEquals('c', $getB);
+		
+		$this->cache->delete($key, 'b')->execute();
+		$this->cache->delete($key, 'd')->execute();
+	}
 }
 
 class myObject extends LiteObject

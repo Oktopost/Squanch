@@ -5,7 +5,7 @@ namespace Squanch\Command;
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
-use Squanch\Objects\Data;
+use Squanch\Enum\TTL;
 
 
 require_once __DIR__.'/../../dummyStorage/Config.php';
@@ -103,7 +103,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$this->cache->set($key, 'data')->setForever()->execute();
 		
 		$result = $this->cache->get($key)->asData();
-		$interval = Data::FOREVER_IN_SEC;
+		$interval = TTL::FOREVER;
 		
 		self::assertLessThan(0, $result->TTL);
 		self::assertEquals($result->Created->modify("+ {$interval} seconds"), $result->EndDate);
@@ -121,5 +121,28 @@ class SetTest extends PHPUnit_Framework_TestCase
 		self::assertEquals($interval, $result->TTL);
 		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate);
 		$this->cache->delete($key)->execute();
+	}
+	
+	public function test_use_two_buckets()
+	{
+		$key = uniqid();
+		$success = [
+			false, false
+		];
+		
+		$setA = $this->cache->set($key, 'a', 'a')->insertOnly()->onSuccess(function() use (&$success){
+			$success[0] = true;
+		})->execute();
+		
+		$setB = $this->cache->set($key, 'a', 'b')->insertOnly()->onSuccess(function() use (&$success){
+			$success[1] = true;
+		})->execute();
+		
+		self::assertTrue($setA);
+		self::assertTrue($setB);
+		self::assertEquals([true, true], $success);
+		
+		$this->cache->delete($key, 'a')->execute();
+		$this->cache->delete($key, 'b')->execute();
 	}
 }
