@@ -25,9 +25,14 @@ abstract class AbstractDelete
 	}
 	
 	
-	public function getBucket(): string
+	protected function getBucket(): string
 	{
 		return $this->bucket;
+	}
+	
+	protected function getKey()
+	{
+		return $this->key;
 	}
 	
 	/**
@@ -37,11 +42,6 @@ abstract class AbstractDelete
 	{
 		$this->bucket = $bucket;
 		return $this;
-	}
-	
-	public function getKey(): string
-	{
-		return $this->key;
 	}
 	
 	/**

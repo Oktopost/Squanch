@@ -8,6 +8,7 @@ use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractDelete;
 
+use Squanch\Exceptions\SquanchException;
 use Squid\MySql\Connectors\IMySqlObjectConnector;
 
 
@@ -35,13 +36,31 @@ class Delete extends AbstractDelete implements ICmdDelete
 	
 	public function execute(): bool
 	{
-		$result = $this->connector->deleteByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
+		$fields = [];
+		
+		if ($this->getKey())
+		{
+			$fields['Id'] = $this->getKey();
+		}
+		
+		if ($this->getBucket())
+		{
+			$fields['Bucket'] = $this->getBucket();
+		}
+		
+		if (!$fields)
+		{
+			throw new SquanchException('Fields not set');
+		}
+		
+		$result = $this->connector->deleteByFields($fields);
 		
 		if ($result)
 		{
 			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, [
 				'key' => $this->getKey(),
-				'bucket' => $this->getBucket()
+				'bucket' => $this->getBucket(),
+				'total' => $result
 			]);
 		}
 		else

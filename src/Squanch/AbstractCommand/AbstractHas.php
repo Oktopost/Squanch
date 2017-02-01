@@ -28,7 +28,7 @@ abstract class AbstractHas
 		return $this->bucket;
 	}
 	
-	protected function getKey(): string
+	protected function getKey()
 	{
 		return $this->key;
 	}

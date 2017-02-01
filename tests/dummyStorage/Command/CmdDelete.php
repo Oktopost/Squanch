@@ -36,16 +36,35 @@ class CmdDelete extends AbstractDelete implements ICmdDelete
 	{
 		$result = false;
 		$bucket = $this->getBucket();
-		$key = $bucket . $this->getKey();
+		$key = $bucket;
+		
+		if ($this->getKey())
+		{
+			$key .= $this->getKey();
+		}
 		
 		$db = $this->connector->getDb();
+		$total = 0;
 		
-		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
+		foreach ($db as $id => $value)
+		{
+			if (preg_match('/^'.$key.'/', $id) && $value->EndDate > (new \DateTime()) && $value->Bucket == $bucket)
+			{
+				$result = true;
+				unset($db[$id]);
+				$total++;
+			}
+		}
+		
+		if ($result)
 		{
 			unset($db[$key]);
 			$this->connector->setDb($db);
-			$result = true;
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, ['key' => $key, 'bucket' => $bucket]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, [
+				'key' => $key,
+				'bucket' => $bucket,
+				'total' => $total
+			]);
 		}
 		else
 		{

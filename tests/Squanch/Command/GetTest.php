@@ -43,15 +43,16 @@ class GetTest extends PHPUnit_Framework_TestCase
 	
 	public function test_resetTtl_on_will_update_ttl()
 	{
-		$this->cache->set('a', 'b')->setTTL(10)->execute();
+		$key = uniqid();
+		$this->cache->set($key, 'b')->setTTL(10)->execute();
 		
-		$get = $this->cache->get('a')->asData();
+		$get = $this->cache->get($key)->asData();
 		self::assertLessThanOrEqual(10, $get->TTL);
 		
-		$updated = $this->cache->get()->byKey('a')->resetTTL(9999)->asData();
+		$updated = $this->cache->get()->byKey($key)->resetTTL(9999)->asData();
 		
 		self::assertTrue($updated->TTL === 9999);
-		$this->cache->delete('a')->execute();
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_asArray_return_array()
