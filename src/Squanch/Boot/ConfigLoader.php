@@ -7,6 +7,7 @@ use Squanch\Enum\Callbacks;
 use Squanch\Objects\Instance;
 use Squanch\Base\Boot\IConfigLoader;
 use Squanch\Exceptions\SquanchInstanceException;
+use Squanch\Exceptions\SquanchUnknownCallbackException;
 
 
 class ConfigLoader implements IConfigLoader
@@ -40,108 +41,16 @@ class ConfigLoader implements IConfigLoader
 	/**
 	 * @param ICallback|\Closure $callback
 	 */
-	public function setSuccessOnGetCallback($callback): IConfigLoader
+	public function callback(string $callbackType, $callback): IConfigLoader
 	{
-		$this->callbacks[Callbacks::SUCCESS_ON_GET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setFailOnGetCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::FAIL_ON_GET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setOnGetCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::ON_GET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setSuccessOnSetCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::SUCCESS_ON_SET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setFailOnSetCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::FAIL_ON_SET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setOnSetCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::ON_SET] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setSuccessOnHasCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::SUCCESS_ON_HAS] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setFailOnHasCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::FAIL_ON_HAS] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setOnHasCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::ON_HAS] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setSuccessOnDeleteCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::SUCCESS_ON_DELETE] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setFailOnDeleteCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::FAIL_ON_DELETE] = [$callback];
-		return $this;
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function setOnDeleteCallback($callback): IConfigLoader
-	{
-		$this->callbacks[Callbacks::ON_DELETE] = [$callback];
+		if (Callbacks::isExists($callbackType))
+		{
+			$this->callbacks[$callbackType] = $callback;
+		}
+		else
+		{
+			throw new SquanchUnknownCallbackException();
+		}
 		return $this;
 	}
 	
