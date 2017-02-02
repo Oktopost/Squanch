@@ -2,7 +2,10 @@
 namespace Squanch\Base;
 
 
+use Squanch\Objects\CallbackData;
+
+
 interface ICallback
 {
-	public function fire(array $data);
+	public function fire(CallbackData $data);
 }

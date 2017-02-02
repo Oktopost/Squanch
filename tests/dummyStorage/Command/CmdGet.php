@@ -2,7 +2,7 @@
 namespace dummyStorage\Command;
 
 
-use Squanch\Enum\Events;
+use Squanch\Objects\CallbackData;
 use Squanch\Objects\Data;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Boot\ICallbacksLoader;
@@ -64,6 +64,8 @@ class CmdGet extends AbstractGet implements ICmdGet
 	
 	public function execute(): bool
 	{
+		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
+		
 		$this->executed = false;
 		$bucket = $this->getBucket();
 		$key = $bucket.$this->getKey();
@@ -72,9 +74,8 @@ class CmdGet extends AbstractGet implements ICmdGet
 		
 		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, [
-				'key' => $key, 'bucket' => $bucket, 'data' => $db[$key]]
-			);
+			$callbackData->setData($db[$key]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
 			
 			/** @var Data $data */
 			$data = $db[$key];
@@ -89,20 +90,15 @@ class CmdGet extends AbstractGet implements ICmdGet
 			
 			$this->data = $data;
 			$this->executed = true;
-			$this->callbacksLoader->executeCallback(Callbacks::ON_GET,
-				['key' => $key, 'bucket' => $bucket, 'event' => Events::SUCCESS, 'data' => $db[$key]]);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_GET, $callbackData);
 			
 			return true;
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, [
-				'key' => $key,
-				'bucket' => $bucket
-			]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
 			
-			$this->callbacksLoader->executeCallback(Callbacks::ON_GET,
-				['key' => $key, 'bucket' => $bucket, 'event' => Events::FAIL]);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_GET, $callbackData);
 			
 			return false;
 		}

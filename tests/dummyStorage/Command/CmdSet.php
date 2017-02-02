@@ -6,7 +6,7 @@ use Objection\Mapper;
 use Objection\LiteObject;
 
 use Squanch\Objects\Data;
-use Squanch\Enum\Events;
+use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Boot\ICallbacksLoader;
@@ -39,6 +39,8 @@ class CmdSet extends AbstractSet implements ICmdSet
 	
 	public function execute(): bool
 	{
+		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
+		
 		$db = $this->connector->getDb();
 		$bucket = $this->getBucket();
 		$key = $bucket . $this->getKey();
@@ -67,14 +69,13 @@ class CmdSet extends AbstractSet implements ICmdSet
 		
 		$data->setTTL($this->getTTL());
 		
+		$callbackData->setData($data);
 		if (
 			($exists && $this->isInsertOnly()) ||
 			(!$exists && $this->isUpdateOnly())
 		)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, [
-				'key' => $key, 'bucket' => $bucket, 'data' => $data]
-			);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, $callbackData);
 			
 			$this->reset();
 			
@@ -84,13 +85,10 @@ class CmdSet extends AbstractSet implements ICmdSet
 		$db[$key] = $data;
 		$this->connector->setDb($db);
 		
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, [
-			'key' => $key, 'bucket' => $bucket, 'data' => $data]
-		);
+		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, $callbackData);
 		
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
-			'key' => $this->getKey(), 'bucket' => $bucket, 'event' => Events::SUCCESS, 'data' => $data]);
+		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, $callbackData);
 		
 		$this->reset();
 		

@@ -3,7 +3,7 @@ namespace Squanch\Plugins\Squid\Command;
 
 
 use Squanch\Objects\Data;
-use Squanch\Enum\Events;
+use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Boot\ICallbacksLoader;
@@ -81,33 +81,26 @@ class Get extends AbstractGet implements ICmdGet
 	public function execute(): bool
 	{
 		$result = false;
+		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
 		
 		$this->data = $this->connector->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
 		if ($this->data && $this->data->EndDate > new \DateTime())
 		{
 			$result = true;
+			$callbackData->setData($this->data);
 			
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET,
-				['key' => $this->getKey(), 'bucket' => $this->getBucket(), 'data' => $this->data]);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
 			
 			$this->updateTTLIfNeed();
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, [
-				'key' => $this->getKey(),
-				'bucket' => $this->getBucket()
-			]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
 			$this->data = null;
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_GET, [
-			'key' => $this->getKey(), 
-			'bucket' => $this->getBucket(), 
-			'event' => $result ? Events::SUCCESS : Events::FAIL
-			]
-		);
+		$this->callbacksLoader->executeCallback(Callbacks::ON_GET, $callbackData);
 		
 		
 		return $result;

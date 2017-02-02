@@ -2,9 +2,9 @@
 namespace Squanch\Plugins\Squid\Command;
 
 
-use Squanch\Enum\Events;
 use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
+use Squanch\Objects\CallbackData;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractHas;
@@ -52,6 +52,8 @@ class Has extends AbstractHas implements ICmdHas
 	
 	public function execute(): bool
 	{
+		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
+		
 		/** @var Data $result */
 		$result = $this->connector->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
@@ -63,26 +65,15 @@ class Has extends AbstractHas implements ICmdHas
 		if ($result)
 		{
 			$this->updateTTLIfNeed();
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, [
-				'key' => $this->getKey(), 'bucket' => $this->getBucket()]
-			);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
-				'key' => $this->getKey(), 'bucket' => $this->getBucket(), 'event' => Events::SUCCESS]
-			);
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, [
-				'key' => $this->getKey(),
-				'bucket' => $this->getBucket(),
-			]);
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
-			'key' => $this->getKey(),
-			'bucket' => $this->getBucket(),
-			'event' => Events::FAIL
-		]);
+		$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
 		
 		return $result;
 	}

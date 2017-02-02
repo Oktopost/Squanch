@@ -2,8 +2,8 @@
 namespace dummyStorage\Command;
 
 
-use Squanch\Enum\Events;
 use Squanch\Objects\Data;
+use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Boot\ICallbacksLoader;
@@ -37,6 +37,9 @@ class CmdHas extends AbstractHas implements ICmdHas
 	
 	public function execute(): bool
 	{
+		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
+		$result = false;
+		
 		$bucket = $this->getBucket();
 		$key = $bucket.$this->getKey();
 		
@@ -44,7 +47,8 @@ class CmdHas extends AbstractHas implements ICmdHas
 		
 		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, ['key' => $key, 'bucket' => $bucket]);
+			$result = true;
+			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
 			
 			/** @var Data $item */
 			$item = $db[$key];
@@ -57,22 +61,16 @@ class CmdHas extends AbstractHas implements ICmdHas
 				unset($this->newTTL);
 			}
 			
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
-				'key' => $key, 'bucket' => $bucket, 'event' => Events::SUCCESS]
-			);
-			
-			$this->reset();
-			return true;
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, ['key' => $key, 'bucket' => $bucket]);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, [
-				'key' => $key, 'bucket' => $bucket, 'event' => Events::FAIL]
-			);
-			$this->reset();
-			return false;
+			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
+			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
+		
+		$this->reset();
+		return $result;
 	}
 	
 	public function resetTTL(int $ttl)

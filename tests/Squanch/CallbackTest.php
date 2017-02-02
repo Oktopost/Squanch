@@ -6,6 +6,7 @@ use Squanch\Base\ICachePlugin;
 
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
+use Squanch\Objects\CallbackData;
 
 
 require_once __DIR__.'/../dummyStorage/Config.php';
@@ -45,7 +46,7 @@ class myCallback implements ICallback
 	private static $result = false;
 	
 	
-	public function fire(array $data)
+	public function fire(CallbackData $data)
 	{
 		self::$result = true;
 	}

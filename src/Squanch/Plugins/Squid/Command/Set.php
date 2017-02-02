@@ -3,8 +3,8 @@ namespace Squanch\Plugins\Squid\Command;
 
 
 use Squanch\Enum\Callbacks;
-use Squanch\Enum\Events;
 use Squanch\Objects\Data;
+use Squanch\Objects\CallbackData;
 use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractSet;
@@ -36,32 +36,27 @@ class Set extends AbstractSet implements ICmdSet
 		return ($exists && $this->isInsertOnly()) || (!$exists && $this->isUpdateOnly());
 	}
 	
-	private function onFailCallback(Data $data)
+	private function getCallbackData(Data $data): CallbackData
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, [
-			'key' => $this->getKey(),
-			'bucket' => $this->getBucket(),
-			'data' => $data
-		]);
+		return (new CallbackData())
+			->setKey($this->getKey())
+			->setBucket($this->getBucket())
+			->setData($data);
 	}
 	
-	private function onCompleteCallback(Data $data, bool $event)
+	private function onFailCallback(Data $data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, [
-			'key' => $this->getKey(),
-			'bucket' => $this->getBucket(),
-			'event' => $event ? Events::SUCCESS : Events::FAIL, 
-			'data' => $data
-		]);
+		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, $this->getCallbackData($data));
+	}
+	
+	private function onCompleteCallback(Data $data)
+	{
+		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, $this->getCallbackData($data));
 	}
 	
 	private function onSuccessCallback($data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, [
-			'key' => $this->getKey(), 
-			'bucket' => $this->getBucket(),
-			'data' => $data
-		]);
+		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, $this->getCallbackData($data));
 	}
 	
 	
@@ -109,7 +104,7 @@ class Set extends AbstractSet implements ICmdSet
 			if ($this->isInsertOrUpdateOnly($exists))
 			{
 				$this->onFailCallback($data);
-				$this->onCompleteCallback($data, false);
+				$this->onCompleteCallback($data);
 				$this->reset();
 				
 				return false;
@@ -121,13 +116,13 @@ class Set extends AbstractSet implements ICmdSet
 		if ($result)
 		{
 			$this->onSuccessCallback($data);
-			$this->onCompleteCallback($data, true);
 		}
 		else
 		{
 			$this->onFailCallback($data);
-			$this->onCompleteCallback($data, false);
 		}
+		
+		$this->onCompleteCallback($data);
 		
 		$this->reset();
 		

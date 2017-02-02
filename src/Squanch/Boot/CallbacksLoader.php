@@ -4,6 +4,7 @@ namespace Squanch\Boot;
 
 use Squanch\Base\ICallback;
 use Squanch\Base\Boot\ICallbacksLoader;
+use Squanch\Objects\CallbackData;
 
 
 class CallbacksLoader implements ICallbacksLoader
@@ -24,7 +25,7 @@ class CallbacksLoader implements ICallbacksLoader
 		$this->callbacks[$callbackType][] = $callback;
 	}
 	
-	public function executeCallback(string $callbackType, array $data)
+	public function executeCallback(string $callbackType, CallbackData $data)
 	{
 		if (isset($this->callbacks[$callbackType]))
 		{

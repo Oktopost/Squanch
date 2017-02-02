@@ -3,6 +3,7 @@ namespace Squanch\Base\Boot;
 
 
 use Squanch\Base\ICallback;
+use Squanch\Objects\CallbackData;
 
 
 interface ICallbacksLoader
@@ -13,5 +14,5 @@ interface ICallbacksLoader
 	 */
 	public function addCallback(string $callbackType, $callback);
 	
-	public function executeCallback(string $callbackType, array $data);
+	public function executeCallback(string $callbackType, CallbackData $data);
 }
