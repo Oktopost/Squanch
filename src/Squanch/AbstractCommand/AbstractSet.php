@@ -130,6 +130,15 @@ abstract class AbstractSet
 	}
 	
 	/**
+	 * @return static
+	 */
+	public function flushCallbacks()
+	{
+		$this->getCallbacksLoader()->flushCallbacks();
+		return $this;
+	}
+	
+	/**
 	 * @param \Closure|ICallback $onFail
 	 * @return static
 	 */

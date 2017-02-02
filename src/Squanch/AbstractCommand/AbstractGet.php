@@ -89,6 +89,15 @@ abstract class AbstractGet
 	}
 	
 	/**
+	 * @return static
+	 */
+	public function flushCallbacks()
+	{
+		$this->getCallbacksLoader()->flushCallbacks();
+		return $this;
+	}
+	
+	/**
 	 * @param \Closure|ICallback $onSuccess
 	 * @return static
 	 */

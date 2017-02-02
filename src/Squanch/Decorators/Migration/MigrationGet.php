@@ -91,6 +91,7 @@ class MigrationGet implements ICmdGet
 			}
 		);
 		
+		$this->flushCallbacks();
 		$this->appendCallbacks($this->get);
 		
 		return $this->get->execute();
@@ -227,6 +228,15 @@ class MigrationGet implements ICmdGet
 	public function onComplete($onComplete)
 	{
 		$this->callbacks[Callbacks::ON_GET][] = $onComplete;
+		return $this;
+	}
+	
+	/**
+	 * @return static
+	 */
+	public function flushCallbacks()
+	{
+		$this->get->flushCallbacks();
 		return $this;
 	}
 }

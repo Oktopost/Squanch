@@ -71,6 +71,14 @@ abstract class AbstractHas
 		return $this;
 	}
 	
+	/**
+	 * @return static
+	 */
+	public function flushCallbacks()
+	{
+		$this->getCallbacksLoader()->flushCallbacks();
+		return $this;
+	}
 	
 	/**
 	 * @param \Closure|ICallback $onSuccess
