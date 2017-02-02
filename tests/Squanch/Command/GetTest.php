@@ -41,7 +41,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		self::assertFalse($get->execute());
 	}
 	
-	public function test_resetTtl_on_will_update_ttl()
+	public function test_resetTTL_will_update_ttl()
 	{
 		$key = uniqid();
 		$this->cache->set($key, 'b')->setTTL(10)->execute();
@@ -69,12 +69,13 @@ class GetTest extends PHPUnit_Framework_TestCase
 	
 	public function test_as_Object_return_object()
 	{
-		$this->cache->set('a', (object)['a'=>1])->execute();
-		$get = $this->cache->get('a')->asObject();
+		$key = uniqid();
+		$this->cache->set($key, (object)['a'=>1])->execute();
+		$get = $this->cache->get($key)->asObject();
 		
 		self::assertTrue(is_object($get));
 		self::assertEquals(1, $get->a);
-		$this->cache->delete('a')->execute();
+		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_as_String_return_string()

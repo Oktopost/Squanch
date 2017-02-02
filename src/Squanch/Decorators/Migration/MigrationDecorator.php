@@ -1,5 +1,5 @@
 <?php
-namespace Squanch\Decorators;
+namespace Squanch\Decorators\Migration;
 
 
 use Squanch\Enum\Bucket;
@@ -11,7 +11,7 @@ use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
-class MissingFallbackDecorator implements ICachePlugin
+class MigrationDecorator implements ICachePlugin
 {
 	private $main;
 	private $fallback;
@@ -26,6 +26,8 @@ class MissingFallbackDecorator implements ICachePlugin
 	
 	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin
 	{
+		$this->main->setCallbacksLoader($callbacksLoader);
+		$this->fallback->setCallbacksLoader($callbacksLoader);
 		return $this;
 	}
 	
@@ -36,7 +38,15 @@ class MissingFallbackDecorator implements ICachePlugin
 	
 	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
-		return $this->main->get($key, $bucketName);
+		$get = new MigrationGet($this->main, $this->fallback);
+		
+		if ($key)
+			$get->byKey($key);
+		
+		if($bucketName)
+			$get->byBucket($bucketName);
+		
+		return $get;
 	}
 	
 	public function has(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
@@ -46,6 +56,6 @@ class MissingFallbackDecorator implements ICachePlugin
 	
 	public function set(string $key = null, $data = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
-		return $this->main->set($key, $bucketName);
+		return $this->main->set($key, $data, $bucketName);
 	}
 }

@@ -24,8 +24,26 @@ class Config
 	/** @var ICachePlugin */
 	private $plugin;
 	
+	/** @var ICachePlugin[] */
+	private $plugins;
 	
-	private function initSquidInstance()
+	
+	private function initMigrationInstance()
+	{
+		$instanceA = $this->initSquidInstance('HardCache');
+		$instanceB = $this->initSquidInstance('SoftCache', 'squid_soft');
+		
+		$plugin = new Squanch\Decorators\Migration\MigrationDecorator($instanceA->Plugin, $instanceB->Plugin);
+		
+		$instance = new Instance();
+		$instance->Name = 'migration';
+		$instance->Type = InstanceType::HARD;
+		$instance->Plugin = $plugin;
+		
+		return $instance;
+	}
+	
+	private function initSquidInstance($tableName = 'HardCache', $instanceName = 'squid')
 	{
 		$mysql = new MySql();
 		
@@ -46,14 +64,14 @@ class Config
 		$connector
 			->setConnector($mysql->getConnector())
 			->setDomain(Data::class)
-			->setTable('HardCache')
+			->setTable($tableName)
 			->setIgnoreFields(['Created', 'Modified']);
 		
 		
 		$plugin = new SquidPlugin($connector);
 		
 		$instance = new Instance();
-		$instance->Name = 'squid';
+		$instance->Name = $instanceName;
 		$instance->Type = InstanceType::HARD;
 		$instance->Plugin = $plugin;
 		
@@ -84,13 +102,22 @@ class Config
 		$configLoader = Squanch::skeleton(IConfigLoader::class);
 		
 		$configLoader->addInstance($this->initDummyInstance());
-		$configLoader->addInstance($this->initSquidInstance());
+		$configLoader->addInstance($this->initSquidInstance('HardCache'));
+		$configLoader->addInstance($this->initSquidInstance('SoftCache', 'squidSoft'));
+		$configLoader->addInstance($this->initMigrationInstance());
 		
 		/** @var IBoot $squanch */
 		$squanch = Squanch::skeleton(IBoot::class);
 		$squanch->setConfigLoader($configLoader);
 		
-		$this->plugin = $squanch->filterInstancesByName($instanceName)->getPlugin();
+		$this->plugins = [
+			'dummy' => $squanch->resetFilters()->filterInstancesByName('dummy')->getPlugin(),
+			'squid' => $squanch->resetFilters()->filterInstancesByName('squid')->getPlugin(),
+			'squidSoft' => $squanch->resetFilters()->filterInstancesByName('squidSoft')->getPlugin(),
+			'migration' => $squanch->resetFilters()->filterInstancesByName('migration')->getPlugin()
+		];
+		
+		$this->plugin = $squanch->resetFilters()->filterInstancesByName($instanceName)->getPlugin();
 	}
 	
 	/**
@@ -99,5 +126,13 @@ class Config
 	public function getPlugin()
 	{
 		return $this->plugin;
+	}
+	
+	/**
+	 * @return ICachePlugin[]
+	 */
+	public function getAllPlugins()
+	{
+		return $this->plugins;
 	}
 }
