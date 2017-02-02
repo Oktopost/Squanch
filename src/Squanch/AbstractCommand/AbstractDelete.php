@@ -11,12 +11,21 @@ use Squanch\Enum\Callbacks;
 
 abstract class AbstractDelete
 {
+	private $connector;
+	private $callbacksLoader;
 	private $key;
 	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
 	
 	
-	abstract protected function getCallbacksLoader(): ICallbacksLoader;
+	protected function getConnector()
+	{
+		return $this->connector;
+	}
 	
+	protected function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbacksLoader;
+	}
 	
 	protected function reset()
 	{
@@ -24,15 +33,26 @@ abstract class AbstractDelete
 		$this->bucket = Bucket::DEFAULT_BUCKET_NAME;
 	}
 	
-	
 	protected function getBucket(): string
 	{
 		return $this->bucket;
 	}
 	
+	
 	protected function getKey()
 	{
 		return $this->key;
+	}
+
+	
+	/**
+	 * @return static
+	 */
+	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	{
+		$this->connector = $connector;
+		$this->callbacksLoader = $callbacksLoader;
+		return $this;
 	}
 	
 	/**

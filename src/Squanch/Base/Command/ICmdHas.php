@@ -2,6 +2,6 @@
 namespace Squanch\Base\Command;
 
 
-interface ICmdHas extends IConstructWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL
+interface ICmdHas extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL
 {
 }

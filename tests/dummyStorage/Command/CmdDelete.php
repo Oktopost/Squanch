@@ -2,35 +2,21 @@
 namespace dummyStorage\Command;
 
 
+use dummyStorage\DummyConnector;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdDelete;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractDelete;
 
-use dummyStorage\DummyConnector;
 use Squanch\Objects\CallbackData;
 
 
 class CmdDelete extends AbstractDelete implements ICmdDelete
 {
-	/** @var DummyConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader  */
-	private $callbacksLoader;
-	
-	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): DummyConnector
 	{
-		return $this->callbacksLoader;
+		return parent::getConnector();
 	}
-
 	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
-	}
 	
 	public function execute(): bool
 	{
@@ -51,7 +37,7 @@ class CmdDelete extends AbstractDelete implements ICmdDelete
 			$callbackData->setBucket($this->getBucket());
 		}
 		
-		$db = $this->connector->getDb();
+		$db = $this->getConnector()->getDb();
 		$total = 0;
 		
 		foreach ($db as $id => $value)
@@ -67,15 +53,15 @@ class CmdDelete extends AbstractDelete implements ICmdDelete
 		if ($result)
 		{
 			unset($db[$key]);
-			$this->connector->setDb($db);
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_DELETE, $callbackData);
+			$this->getConnector()->setDb($db);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_DELETE, $callbackData);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_DELETE, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_DELETE, $callbackData);
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_DELETE, $callbackData);
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_DELETE, $callbackData);
 		
 		$this->reset();
 		

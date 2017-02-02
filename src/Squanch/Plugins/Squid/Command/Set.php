@@ -6,7 +6,6 @@ use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Base\Command\ICmdSet;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractSet;
 
 use Squid\MySql\Connectors\IMySqlObjectConnector;
@@ -17,16 +16,10 @@ use Objection\LiteObject;
 
 class Set extends AbstractSet implements ICmdSet
 {
-	/** @var IMySqlObjectConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader */
-	private $callbacksLoader;
-	
-	
 	private function checkExists(): bool
 	{
-		$has = new Has($this->connector, $this->callbacksLoader);
+		$has = new Has();
+		$has->setup($this->getConnector(), $this->getCallbacksLoader());
 		
 		return $has->byKey($this->getKey())->byBucket($this->getBucket())->execute();
 	}
@@ -46,31 +39,25 @@ class Set extends AbstractSet implements ICmdSet
 	
 	private function onFailCallback(Data $data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, $this->getCallbackData($data));
+		$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_SET, $this->getCallbackData($data));
 	}
 	
 	private function onCompleteCallback(Data $data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, $this->getCallbackData($data));
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_SET, $this->getCallbackData($data));
 	}
 	
 	private function onSuccessCallback($data)
 	{
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, $this->getCallbackData($data));
+		$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_SET, $this->getCallbackData($data));
 	}
 	
 	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): IMySqlObjectConnector
 	{
-		return $this->callbacksLoader;
+		return parent::getConnector();
 	}
 
-	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
-	}
 	
 	public function execute(): bool
 	{
@@ -111,7 +98,7 @@ class Set extends AbstractSet implements ICmdSet
 			}
 		}
 		
-		$result = $this->connector->upsertByFields($data, ['Id', 'Bucket']);
+		$result = $this->getConnector()->upsertByFields($data, ['Id', 'Bucket']);
 		
 		if ($result)
 		{

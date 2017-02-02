@@ -5,7 +5,6 @@ namespace dummyStorage\Command;
 use Squanch\Objects\CallbackData;
 use Squanch\Objects\Data;
 use Squanch\Enum\Callbacks;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\AbstractCommand\AbstractGet;
 
@@ -14,12 +13,6 @@ use dummyStorage\DummyConnector;
 
 class CmdGet extends AbstractGet implements ICmdGet
 {
-	/** @var DummyConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader */
-	private $callbacksLoader;
-	
 	/** @var Data */
 	private $data;
 	private $newTTL;
@@ -36,9 +29,9 @@ class CmdGet extends AbstractGet implements ICmdGet
 		return $this->executed;
 	}
 	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): DummyConnector
 	{
-		return $this->callbacksLoader;
+		return parent::getConnector();
 	}
 	
 	protected function afterExecute()
@@ -47,13 +40,6 @@ class CmdGet extends AbstractGet implements ICmdGet
 		$this->reset();
 	}
 
-	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
-	}
-	
 	
 	public function resetTTL(int $ttl)
 	{
@@ -70,12 +56,12 @@ class CmdGet extends AbstractGet implements ICmdGet
 		$bucket = $this->getBucket();
 		$key = $bucket.$this->getKey();
 		
-		$db = $this->connector->getDb();
+		$db = $this->getConnector()->getDb();
 		
 		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
 			$callbackData->setData($db[$key]);
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
 			
 			/** @var Data $data */
 			$data = $db[$key];
@@ -85,20 +71,20 @@ class CmdGet extends AbstractGet implements ICmdGet
 				$data->setTTL($this->newTTL);
 				unset($this->newTTL);
 				$db[$key] = $data;
-				$this->connector->setDb($db);
+				$this->getConnector()->setDb($db);
 			}
 			
 			$this->data = $data;
 			$this->executed = true;
-			$this->callbacksLoader->executeCallback(Callbacks::ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
 			
 			return true;
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
 			
-			$this->callbacksLoader->executeCallback(Callbacks::ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
 			
 			return false;
 		}

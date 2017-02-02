@@ -10,12 +10,21 @@ use Squanch\Base\Boot\ICallbacksLoader;
 
 abstract class AbstractHas
 {
+	private $connector;
+	private $callbacksLoader;
 	private $key;
 	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
 	
 	
-	abstract protected function getCallbacksLoader(): ICallbacksLoader;
+	protected function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbacksLoader;
+	}
 	
+	protected function getConnector()
+	{
+		return $this->connector;
+	}	
 	
 	protected function reset()
 	{
@@ -33,6 +42,16 @@ abstract class AbstractHas
 		return $this->key;
 	}
 	
+	
+	/**
+	 * @return static
+	 */
+	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	{
+		$this->connector = $connector;
+		$this->callbacksLoader = $callbacksLoader;
+		return $this;
+	}
 	
 	/**
 	 * @return static

@@ -14,21 +14,31 @@ use Objection\LiteObject;
 
 abstract class AbstractGet
 {
+	private $connector;
+	private $callbacksLoader;
 	private $key;
 	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
 	
 	
-	abstract protected function getCallbacksLoader(): ICallbacksLoader;
+	protected function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbacksLoader;
+	}
 	
-	abstract protected function afterExecute();
+	protected function getConnector()
+	{
+		return $this->connector;
+	}
 	
-	abstract protected function executeIfNeed(): bool;
+	protected abstract function afterExecute();
+	
+	protected abstract function executeIfNeed(): bool;
 	
 	
 	/**
 	 * @return Data|bool
 	 */
-	abstract public function asData();
+	public abstract function asData();
 
 	
 	
@@ -49,6 +59,16 @@ abstract class AbstractGet
 		return $this->key;
 	}
 	
+	
+	/**
+	 * @return static
+	 */
+	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	{
+		$this->connector = $connector;
+		$this->callbacksLoader = $callbacksLoader;
+		return $this;
+	}
 	
 	/**
 	 * @return static

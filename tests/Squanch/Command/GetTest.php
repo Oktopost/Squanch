@@ -125,6 +125,18 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$this->cache->delete($key, 'b')->execute();
 		$this->cache->delete($key, 'd')->execute();
 	}
+	
+	public function test_get_onComplete_twice()
+	{
+		$result = [false, false];
+		$this->cache->get('a', 'b')->onComplete(function() use(&$result){
+			$result[0] = true;
+		})->onComplete(function() use(&$result) {
+			$result[1] = true;
+		})->execute();
+		
+		self::assertEquals([true, true], $result);
+	}
 }
 
 class myObject extends LiteObject

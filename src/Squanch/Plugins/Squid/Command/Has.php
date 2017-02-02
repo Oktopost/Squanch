@@ -6,7 +6,6 @@ use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Base\Command\ICmdHas;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractHas;
 
 use Squid\MySql\Connectors\IMySqlObjectConnector;
@@ -14,39 +13,28 @@ use Squid\MySql\Connectors\IMySqlObjectConnector;
 
 class Has extends AbstractHas implements ICmdHas
 {
-	/** @var IMySqlObjectConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader  */
-	private $callbacksLoader;
 	private $newTTL;
 	
 	private function updateTTLIfNeed()
 	{
 		if ($this->newTTL)
 		{
-			$get = new Get($this->connector, $this->getCallbacksLoader());
+			$get = new Get();
+			$get->setup($this->getConnector(), $this->getCallbacksLoader());
 			
 			/** @var Data $object */
 			$object = $get->byKey($this->getKey())->byBucket($this->getBucket())->asData();
 			$object->setTTL($this->newTTL);
-			$this->connector->upsertByFields($object, ['Id', 'Bucket']);
+			$this->getConnector()->upsertByFields($object, ['Id', 'Bucket']);
 			
 			unset($this->newTTL);
 		}
 	}
 	
 	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): IMySqlObjectConnector
 	{
-		return $this->callbacksLoader;
-	}
-	
-	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
+		return parent::getConnector();
 	}
 	
 	
@@ -55,7 +43,7 @@ class Has extends AbstractHas implements ICmdHas
 		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
 		
 		/** @var Data $result */
-		$result = $this->connector->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
+		$result = $this->getConnector()->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
 		
 		if ($result)
 		{
@@ -65,15 +53,15 @@ class Has extends AbstractHas implements ICmdHas
 		if ($result)
 		{
 			$this->updateTTLIfNeed();
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
 		}
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
 		
 		return $result;
 	}

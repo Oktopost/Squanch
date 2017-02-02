@@ -37,7 +37,8 @@ class SquidPlugin implements ICachePlugin
 	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
 		/** @var ICmdDelete $result */
-		$result = new Command\Delete($this->connector, $this->callbacksLoader);
+		$result = new Command\Delete();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -51,7 +52,8 @@ class SquidPlugin implements ICachePlugin
 	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
 		/** @var ICmdGet $result */
-		$result = new Command\Get($this->connector, $this->callbacksLoader);
+		$result = new Command\Get();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -65,7 +67,8 @@ class SquidPlugin implements ICachePlugin
 	public function has(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
 	{
 		/** @var ICmdHas $result */
-		$result = new Command\Has($this->connector, $this->callbacksLoader);
+		$result = new Command\Has();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -79,7 +82,8 @@ class SquidPlugin implements ICachePlugin
 	public function set(string $key = null, $data = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
 		/** @var ICmdSet $result */
-		$result = new Command\Set($this->connector, $this->callbacksLoader);
+		$result = new Command\Set();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->setKey($key);

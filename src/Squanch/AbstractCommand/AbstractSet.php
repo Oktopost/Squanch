@@ -10,6 +10,8 @@ use Squanch\Base\Boot\ICallbacksLoader;
 
 abstract class AbstractSet
 {
+	private $connector;
+	private $callbacksLoader;
 	private $insertOnly;
 	private $updateOnly;
 	private $key;
@@ -18,8 +20,15 @@ abstract class AbstractSet
 	private $ttl;
 	
 	
-	abstract protected function getCallbacksLoader(): ICallbacksLoader;
+	protected function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbacksLoader;
+	}
 	
+	protected function getConnector()
+	{
+		return $this->connector;
+	}	
 	
 	protected function reset()
 	{
@@ -58,6 +67,16 @@ abstract class AbstractSet
 		return $this->data;
 	}
 	
+	
+	/**
+	 * @return static
+	 */
+	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	{
+		$this->connector = $connector;
+		$this->callbacksLoader = $callbacksLoader;
+		return $this;
+	}
 	
 	/**
 	 * @return static

@@ -32,7 +32,8 @@ class DummyStoragePlugin implements ICachePlugin
 	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
 		/** @var ICmdDelete $result */
-		$result = new Command\CmdDelete($this->connector, $this->callbacksLoader);
+		$result = new Command\CmdDelete();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -46,7 +47,8 @@ class DummyStoragePlugin implements ICachePlugin
 	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
 		/** @var ICmdGet $result */
-		$result = new Command\CmdGet($this->connector, $this->callbacksLoader);
+		$result = new Command\CmdGet();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -60,7 +62,8 @@ class DummyStoragePlugin implements ICachePlugin
 	public function has(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
 	{
 		/** @var ICmdHas $result */
-		$result = new Command\CmdHas($this->connector, $this->callbacksLoader);
+		$result = new Command\CmdHas();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if ($key)
 			$result->byKey($key);
@@ -74,7 +77,8 @@ class DummyStoragePlugin implements ICachePlugin
 	public function set(string $key = null, $data = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
 		/** @var ICmdSet $result */
-		$result = new Command\CmdSet($this->connector, $this->callbacksLoader);
+		$result = new Command\CmdSet();
+		$result->setup($this->connector, $this->callbacksLoader);
 		
 		if($key)
 			$result->setKey($key);

@@ -9,7 +9,6 @@ use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdSet;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractSet;
 
 use dummyStorage\DummyConnector;
@@ -17,31 +16,17 @@ use dummyStorage\DummyConnector;
 
 class CmdSet extends AbstractSet implements ICmdSet
 {
-	/** @var  DummyConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader */
-	private $callbacksLoader;
-	
-	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): DummyConnector
 	{
-		return $this->callbacksLoader;
+		return parent::getConnector();
 	}
 
-	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
-	}
-	
 	
 	public function execute(): bool
 	{
 		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
 		
-		$db = $this->connector->getDb();
+		$db = $this->getConnector()->getDb();
 		$bucket = $this->getBucket();
 		$key = $bucket . $this->getKey();
 		$exists = isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket;
@@ -75,7 +60,7 @@ class CmdSet extends AbstractSet implements ICmdSet
 			(!$exists && $this->isUpdateOnly())
 		)
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_SET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_SET, $callbackData);
 			
 			$this->reset();
 			
@@ -83,12 +68,12 @@ class CmdSet extends AbstractSet implements ICmdSet
 		}
 		
 		$db[$key] = $data;
-		$this->connector->setDb($db);
+		$this->getConnector()->setDb($db);
 		
-		$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_SET, $callbackData);
+		$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_SET, $callbackData);
 		
 		
-		$this->callbacksLoader->executeCallback(Callbacks::ON_SET, $callbackData);
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_SET, $callbackData);
 		
 		$this->reset();
 		

@@ -2,7 +2,7 @@
 namespace Squanch\Base\Command;
 
 
-interface ICmdSet extends IConstructWithConnectorAndCallbacksLoader, ICommand
+interface ICmdSet extends ISetupWithConnectorAndCallbacksLoader, ICommand
 {
 	/**
 	 * @return static

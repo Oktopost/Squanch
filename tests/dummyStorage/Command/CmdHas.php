@@ -6,7 +6,6 @@ use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdHas;
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\AbstractCommand\AbstractHas;
 
 use dummyStorage\DummyConnector;
@@ -14,24 +13,12 @@ use dummyStorage\DummyConnector;
 
 class CmdHas extends AbstractHas implements ICmdHas
 {
-	/** @var DummyConnector */
-	private $connector;
-	
-	/** @var ICallbacksLoader */
-	private $callbacksLoader;
 	private $newTTL;
 	
 	
-	protected function getCallbacksLoader(): ICallbacksLoader
+	protected function getConnector(): DummyConnector
 	{
-		return $this->callbacksLoader;
-	}
-	
-	
-	public function __construct($connector, ICallbacksLoader $callbacksLoader)
-	{
-		$this->connector = $connector;
-		$this->callbacksLoader = $callbacksLoader;
+		return parent::getConnector();
 	}
 	
 	
@@ -43,12 +30,12 @@ class CmdHas extends AbstractHas implements ICmdHas
 		$bucket = $this->getBucket();
 		$key = $bucket.$this->getKey();
 		
-		$db = $this->connector->getDB();
+		$db = $this->getConnector()->getDB();
 		
 		if (isset($db[$key]) && $db[$key]->EndDate > (new \DateTime()) && $db[$key]->Bucket == $bucket)
 		{
 			$result = true;
-			$this->callbacksLoader->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
 			
 			/** @var Data $item */
 			$item = $db[$key];
@@ -57,17 +44,16 @@ class CmdHas extends AbstractHas implements ICmdHas
 			{
 				$item->setTTL($this->newTTL);
 				$db[$key] = $item;
-				$this->connector->setDb($db);
+				$this->getConnector()->setDb($db);
 				unset($this->newTTL);
 			}
-			
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
 		else
 		{
-			$this->callbacksLoader->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
-			$this->callbacksLoader->executeCallback(Callbacks::ON_HAS, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
 		}
+		
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
 		
 		$this->reset();
 		return $result;
