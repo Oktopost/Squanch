@@ -16,6 +16,9 @@ class MigrationDecorator implements ICachePlugin
 	private $main;
 	private $fallback;
 	
+	/** @var ICallbacksLoader */
+	private $callbackLoader;
+	
 	
 	public function __construct(ICachePlugin $main, ICachePlugin $fallback)
 	{
@@ -28,6 +31,8 @@ class MigrationDecorator implements ICachePlugin
 	{
 		$this->main->setCallbacksLoader($callbacksLoader);
 		$this->fallback->setCallbacksLoader($callbacksLoader);
+		$this->callbackLoader = $callbacksLoader;
+		
 		return $this;
 	}
 	
@@ -39,6 +44,7 @@ class MigrationDecorator implements ICachePlugin
 	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
 		$get = new MigrationGet($this->main, $this->fallback);
+		$get->setup(null, $this->callbackLoader);
 		
 		if ($key)
 			$get->byKey($key);

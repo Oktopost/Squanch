@@ -26,30 +26,9 @@ class MigrationGet implements ICmdGet
 	private $key;
 	private $bucket;
 	
-	private $callbacks = [
-		Callbacks::SUCCESS_ON_GET => [],
-		Callbacks::FAIL_ON_GET => [],
-		Callbacks::ON_GET => []
-	];
+	/** @var ICallbacksLoader */
+	private $callbackLoader;
 	
-	
-	private function appendCallbacks(ICmdGet $get)
-	{
-		foreach ($this->callbacks[Callbacks::SUCCESS_ON_GET] as $callback)
-		{
-			$get->onSuccess($callback);
-		}
-		
-		foreach ($this->callbacks[Callbacks::FAIL_ON_GET] as $callback)
-		{
-			$get->onFail($callback);
-		}
-		
-		foreach ($this->callbacks[Callbacks::ON_GET] as $callback)
-		{
-			$get->onComplete($callback);
-		}
-	}
 	
 	private function executeIfNeed(): bool
 	{
@@ -64,7 +43,6 @@ class MigrationGet implements ICmdGet
 	private function executeMain()
 	{
 		$this->get = $this->main->get($this->key, $this->bucket);
-		$this->appendCallbacks($this->get);
 		
 		if ($this->newTTL)
 		{
@@ -91,9 +69,6 @@ class MigrationGet implements ICmdGet
 			}
 		);
 		
-		$this->flushCallbacks();
-		$this->appendCallbacks($this->get);
-		
 		return $this->get->execute();
 	}
 	
@@ -108,6 +83,8 @@ class MigrationGet implements ICmdGet
 	public function execute(): bool
 	{
 		$this->executed = false;
+		$callbackData = new CallbackData();
+		$callbackData->setKey($this->key)->setBucket($this->bucket);
 		
 		if (!$this->executeMain())
 		{
@@ -118,10 +95,17 @@ class MigrationGet implements ICmdGet
 			$result = true;
 		}
 		
-		if (!$this->get)
+		if ($result)
 		{
-			$result = false;
+			$callbackData->Data = $this->get->asData();
+			$this->callbackLoader->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
 		}
+		else
+		{
+			$this->callbackLoader->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+		}
+		
+		$this->callbackLoader->executeCallback(Callbacks::ON_GET, $callbackData);
 		
 		$this->executed = true;
 		
@@ -211,32 +195,27 @@ class MigrationGet implements ICmdGet
 		return $this;
 	}
 	
-	public function setup($connector, ICallbacksLoader $callbacksLoader) {}
+	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	{
+		$this->callbackLoader = $callbacksLoader;
+		return $this;
+	}
 	
 	public function onSuccess($onSuccess)
 	{
-		$this->callbacks[Callbacks::SUCCESS_ON_GET][] = $onSuccess;
+		$this->callbackLoader->addCallback(Callbacks::SUCCESS_ON_GET, $onSuccess);
 		return $this;
 	}
 	
 	public function onFail($onFail)
 	{
-		$this->callbacks[Callbacks::FAIL_ON_GET][] = $onFail;
+		$this->callbackLoader->addCallback(Callbacks::FAIL_ON_GET, $onFail);
 		return $this;
 	}
 	
 	public function onComplete($onComplete)
 	{
-		$this->callbacks[Callbacks::ON_GET][] = $onComplete;
-		return $this;
-	}
-	
-	/**
-	 * @return static
-	 */
-	public function flushCallbacks()
-	{
-		$this->get->flushCallbacks();
+		$this->callbackLoader->addCallback(Callbacks::ON_GET, $onComplete);
 		return $this;
 	}
 }

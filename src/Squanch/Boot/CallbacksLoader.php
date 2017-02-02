@@ -84,9 +84,4 @@ class CallbacksLoader implements ICallbacksLoader
 			$this->callbacks[$callbackType] = [];
 		}
 	}
-	
-	public function flushCallbacks()
-	{
-		$this->callbacks = [];
-	}
 }

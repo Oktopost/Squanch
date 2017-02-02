@@ -8,11 +8,6 @@ use Squanch\Base\ICallback;
 interface ICmdCallback
 {
 	/**
-	 * @return static
-	 */
-	public function flushCallbacks();
-	
-	/**
 	 * @param ICallback|\Closure $onSuccess
 	 * @return static
 	 */

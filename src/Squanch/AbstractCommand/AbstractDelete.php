@@ -73,12 +73,6 @@ abstract class AbstractDelete
 		return $this;
 	}
 	
-	public function flushCallbacks()
-	{
-		$this->getCallbacksLoader()->flushCallbacks();
-		return $this;
-	}
-	
 	/**
 	 * @param \Closure|ICallback $onSuccess
 	 * @return static

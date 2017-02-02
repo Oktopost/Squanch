@@ -97,7 +97,7 @@ abstract class AbstractSet
 	}
 	
 	/**
-	 * @param static $data
+	 * @return static
 	 */
 	public function setData($data)
 	{
@@ -126,15 +126,6 @@ abstract class AbstractSet
 	public function onSuccess($onSuccess)
 	{
 		$this->getCallbacksLoader()->addCallback(Callbacks::SUCCESS_ON_SET, $onSuccess);
-		return $this;
-	}
-	
-	/**
-	 * @return static
-	 */
-	public function flushCallbacks()
-	{
-		$this->getCallbacksLoader()->flushCallbacks();
 		return $this;
 	}
 	
