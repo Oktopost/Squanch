@@ -44,7 +44,7 @@ class CallbacksLoader implements ICallbacksLoader
 				}
 				else if ($callback instanceof \Closure)
 				{
-					$callback($callbackType, $data);
+					$callback($data);
 				}
 			}
 		}

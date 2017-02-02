@@ -6,6 +6,8 @@ use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
 use Squanch\Enum\TTL;
+use Squanch\Objects\CallbackData;
+use Squanch\Objects\Data;
 
 
 require_once __DIR__.'/../../dummyStorage/Config.php';
@@ -43,7 +45,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$this->cache->delete($key)->execute();
 	}
 	
-	public function test_onSetSuccess_on_update_reutrn_true()
+	public function test_onSetSuccess_on_update_return_true()
 	{
 		$result = false;
 		$this->cache->set('a', 'b')->execute();
@@ -52,6 +54,18 @@ class SetTest extends PHPUnit_Framework_TestCase
 		})->execute();
 		
 		self::assertTrue($result);
+		$this->cache->delete('a')->execute();
+	}
+	
+	public function test_onSetSuccess_callback_contains_data()
+	{
+		$this->cache->set('a', 'b')->onSuccess(function($callbackData){
+			self::assertInstanceOf(CallbackData::class, $callbackData);
+			self::assertEquals('a', $callbackData->Key);
+			self::assertInstanceOf(Data::class, $callbackData->Data);
+			self::assertEquals('b', $callbackData->Data->Value);
+		})->execute();
+		
 		$this->cache->delete('a')->execute();
 	}
 	
