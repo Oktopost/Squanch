@@ -2,6 +2,7 @@
 namespace Squanch\Boot;
 
 
+use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\ICachePlugin;
 use Squanch\Base\Boot\IBoot;
 use Squanch\Base\Boot\IConfigLoader;
@@ -48,14 +49,28 @@ class Boot implements IBoot
 		$this->filteredInstances = $instances;
 	}
 	
+	private function getCallbacksLoaderWithCallbacks(): ICallbacksLoader
+	{
+		/** @var ICallbacksLoader $loader */
+		$loader = $this->callbacksLoader;
+		
+		foreach ($this->config->getCallbacks() as $key => $value)
+		{
+			$loader->addCallback($key, $value, true);
+		}
+		
+		return $this->callbacksLoader;
+	}
+	
 	
 	public function resetFilters()
 	{
 		$this->filteredInstances = $this->config->getInstances();
+		$callbacksLoader = $this->getCallbacksLoaderWithCallbacks();
 		
 		foreach ($this->filteredInstances as $instance)
 		{
-			$instance->Plugin->setCallbacksLoader($this->callbacksLoader);
+			$instance->Plugin->setCallbacksLoader($callbacksLoader);
 		}
 		
 		return $this;

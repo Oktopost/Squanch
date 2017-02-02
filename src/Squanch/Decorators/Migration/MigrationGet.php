@@ -64,12 +64,13 @@ class MigrationGet implements ICmdGet
 	private function executeMain()
 	{
 		$this->get = $this->main->get($this->key, $this->bucket);
+		$this->appendCallbacks($this->get);
+		
 		if ($this->newTTL)
 		{
 			$this->get->resetTTL($this->newTTL);
 		}
 		
-		$this->appendCallbacks($this->get);
 		return $this->get->execute();
 	}
 	

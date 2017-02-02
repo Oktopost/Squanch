@@ -58,6 +58,15 @@ class ConfigLoader implements IConfigLoader
 	/**
 	 * @param ICallback|\Closure $callback
 	 */
+	public function setOnGetCallback($callback): IConfigLoader
+	{
+		$this->callbacks[Callbacks::ON_GET] = [$callback];
+		return $this;
+	}
+	
+	/**
+	 * @param ICallback|\Closure $callback
+	 */
 	public function setSuccessOnSetCallback($callback): IConfigLoader
 	{
 		$this->callbacks[Callbacks::SUCCESS_ON_SET] = [$callback];
@@ -70,6 +79,15 @@ class ConfigLoader implements IConfigLoader
 	public function setFailOnSetCallback($callback): IConfigLoader
 	{
 		$this->callbacks[Callbacks::FAIL_ON_SET] = [$callback];
+		return $this;
+	}
+	
+	/**
+	 * @param ICallback|\Closure $callback
+	 */
+	public function setOnSetCallback($callback): IConfigLoader
+	{
+		$this->callbacks[Callbacks::ON_SET] = [$callback];
 		return $this;
 	}
 	
@@ -94,6 +112,15 @@ class ConfigLoader implements IConfigLoader
 	/**
 	 * @param ICallback|\Closure $callback
 	 */
+	public function setOnHasCallback($callback): IConfigLoader
+	{
+		$this->callbacks[Callbacks::ON_HAS] = [$callback];
+		return $this;
+	}
+	
+	/**
+	 * @param ICallback|\Closure $callback
+	 */
 	public function setSuccessOnDeleteCallback($callback): IConfigLoader
 	{
 		$this->callbacks[Callbacks::SUCCESS_ON_DELETE] = [$callback];
@@ -106,6 +133,15 @@ class ConfigLoader implements IConfigLoader
 	public function setFailOnDeleteCallback($callback): IConfigLoader
 	{
 		$this->callbacks[Callbacks::FAIL_ON_DELETE] = [$callback];
+		return $this;
+	}
+	
+	/**
+	 * @param ICallback|\Closure $callback
+	 */
+	public function setOnDeleteCallback($callback): IConfigLoader
+	{
+		$this->callbacks[Callbacks::ON_DELETE] = [$callback];
 		return $this;
 	}
 	

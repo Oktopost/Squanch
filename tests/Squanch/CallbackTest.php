@@ -38,6 +38,19 @@ class CallbackTest extends PHPUnit_Framework_TestCase
 		
 		self::assertTrue($callback::getResult());
 	}
+	
+	public function test_second_query_not_affected_by_callback_on_first_query()
+	{
+		$increment = 0;
+		
+		$this->cache->get(uniqid())->onComplete(function() use(&$increment){
+			$increment++;
+		})->execute();
+		
+		$this->cache->get(uniqid())->execute();
+	
+		self::assertEquals(1, $increment);
+	}
 }
 
 
