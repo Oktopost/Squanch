@@ -48,7 +48,13 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 		self::assertTrue($result);
 	}
 	
-	public function test_onDeleteFail_return_true()
+	public function test_onDelete_fake_return_false()
+	{
+		$delete = $this->cache->delete('fake')->execute();
+		self::assertFalse($delete);
+	}
+	
+	public function test_onDeleteFail_return_true_for_callback()
 	{
 		$result = false;
 		
@@ -101,7 +107,8 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 			$this->cache->get('c', 'b')->asString(),
 		];
 		
-		self::assertEquals(3, $delete);
+		// result could be bool instead of int in case of using nosql storage
+		self::assertEquals(3||true, $delete);
 		self::assertEquals(['a','a','a'], $get);
 		
 		$deleteSecond = $this->cache->delete()->byBucket('b')->execute();

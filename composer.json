@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "oktopost/squid": "^1.0",
-        "predis/predis": "^1.1",
+        "cache/cache": "^0.3.0",
         "phpunit/phpunit": "5.5.*"
     },
     "autoload": {
@@ -41,8 +41,8 @@
         "test": "bash test.sh"
     },
     "suggest": {
-        "predis/predis": "Use REDIS",
-        "oktopost/squid": "Use Squid"
+        "cache/cache": "Use Redis (or any other cache/cache) adapter for storing cache",
+        "oktopost/squid": "Use mysql for storing cache"
     },
     "minimum-stability": "stable"
 }

@@ -10,9 +10,13 @@ use Squanch\Enum\InstancePriority;
 use Squanch\Enum\InstanceType;
 use Squanch\Objects\Data;
 use Squanch\Objects\Instance;
+use Squanch\Plugins\PhpCache\PhpCachePlugin;
 use Squanch\Plugins\Squid\SquanchSquidConnector;
 use Squanch\Plugins\Squid\SquidPlugin;
+
+use Redis;
 use Squid\MySql;
+use Cache\Adapter\Redis\RedisCachePool;
 
 
 
@@ -27,6 +31,21 @@ class Config
 	/** @var ICachePlugin[] */
 	private $plugins;
 	
+	
+	private function initRedisInstance()
+	{
+		$client = new Redis();
+		$client->connect('127.0.0.1', 6379);
+		
+		$plugin = new PhpCachePlugin(new RedisCachePool($client));
+		
+		$instance = new Instance();
+		$instance->Name = 'redis';
+		$instance->Type = InstanceType::SOFT;
+		$instance->Plugin = $plugin;
+		
+		return $instance;
+	}
 	
 	private function initMigrationInstance()
 	{
@@ -105,6 +124,7 @@ class Config
 		$configLoader->addInstance($this->initSquidInstance('HardCache'));
 		$configLoader->addInstance($this->initSquidInstance('SoftCache', 'squidSoft'));
 		$configLoader->addInstance($this->initMigrationInstance());
+		$configLoader->addInstance($this->initRedisInstance());
 		
 		/** @var IBoot $squanch */
 		$squanch = Squanch::skeleton(IBoot::class);
@@ -114,7 +134,8 @@ class Config
 			'dummy' => $squanch->resetFilters()->filterInstancesByName('dummy')->getPlugin(),
 			'squid' => $squanch->resetFilters()->filterInstancesByName('squid')->getPlugin(),
 			'squidSoft' => $squanch->resetFilters()->filterInstancesByName('squidSoft')->getPlugin(),
-			'migration' => $squanch->resetFilters()->filterInstancesByName('migration')->getPlugin()
+			'migration' => $squanch->resetFilters()->filterInstancesByName('migration')->getPlugin(),
+		    'redis' => $squanch->resetFilters()->filterInstancesByName('redis')->getPlugin(),
 		];
 		
 		$this->plugin = $squanch->resetFilters()->filterInstancesByName($instanceName)->getPlugin();

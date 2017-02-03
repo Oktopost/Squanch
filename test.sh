@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTANCES=(dummy squid migration);
+INSTANCES=(dummy squid migration redis);
 
 for i in ${INSTANCES[@]}; do
 	export instance=$i;
