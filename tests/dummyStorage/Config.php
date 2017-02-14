@@ -14,10 +14,9 @@ use Squanch\Plugins\PhpCache\PhpCachePlugin;
 use Squanch\Plugins\Squid\SquanchSquidConnector;
 use Squanch\Plugins\Squid\SquidPlugin;
 
-use Redis;
 use Squid\MySql;
-use Cache\Adapter\Redis\RedisCachePool;
-
+use Predis\Client;
+use Cache\Adapter\Predis\PredisCachePool;
 
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -34,10 +33,13 @@ class Config
 	
 	private function initRedisInstance()
 	{
-		$client = new Redis();
-		$client->connect('127.0.0.1', 6379);
+		$client = new Client([
+			'scheme' => 'tcp',
+			'host' => '127.0.0.1',
+			'port' => 6379
+		]);
 		
-		$plugin = new PhpCachePlugin(new RedisCachePool($client));
+		$plugin = new PhpCachePlugin(new PredisCachePool($client));
 		
 		$instance = new Instance();
 		$instance->Name = 'redis';
