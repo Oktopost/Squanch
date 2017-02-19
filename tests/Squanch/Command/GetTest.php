@@ -111,6 +111,32 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$this->cache->delete($key)->execute();
 	}
 	
+	public function test_as_array_of_LiteObjects()
+	{
+		$key = uniqid();
+		$obj = new myOtherObject();
+		$obj->a = 'b';
+		$anotherObj = new $obj();
+		$anotherObj->a = 'c';
+		
+		$array = [$obj, $anotherObj];
+		
+		$this->cache->set($key, $array)->execute();
+		
+		$get = $this->cache->get($key)->asArrayOfLiteObjects(myOtherObject::class);
+		
+		foreach ($get as $key => $value)
+		{
+			self::assertInstanceOf(myOtherObject::class, $value);
+		}
+		
+		self::assertEquals('b', $get[0]->a);
+		self::assertEquals('c', $get[1]->a);
+		
+		$this->cache->delete($key)->execute();
+		
+	}
+	
 	public function test_use_two_buckets()
 	{
 		$key = uniqid();

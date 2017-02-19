@@ -7,6 +7,7 @@ use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\AbstractCommand\AbstractGet;
+use Squanch\Exceptions\SquanchException;
 
 use Squid\MySql\Connectors\IMySqlObjectConnector;
 
@@ -67,9 +68,28 @@ class Get extends AbstractGet implements ICmdGet
 	public function execute(): bool
 	{
 		$result = false;
-		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
+		$callbackData = (new CallbackData());
 		
-		$this->data = $this->getConnector()->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
+		$fields = [];
+		
+		if ($this->getKey())
+		{
+			$fields['Id'] = $this->getKey();
+			$callbackData->setKey($this->getKey());
+		}
+		
+		if ($this->getBucket())
+		{
+			$fields['Bucket'] = $this->getBucket();
+			$callbackData->setBucket($this->getBucket());
+		}
+		
+		if (!$fields)
+		{
+			throw new SquanchException('Fields are not set');
+		}
+		
+		$this->data = $this->getConnector()->loadOneByFields($fields);
 		
 		if ($this->data && $this->data->EndDate > new \DateTime())
 		{

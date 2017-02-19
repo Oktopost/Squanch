@@ -166,6 +166,25 @@ abstract class AbstractGet
 		return $result;
 	}
 	
+	public function asArrayOfLiteObjects(string $liteObjectName)
+	{
+		if (!$this->executeIfNeed())
+			return false;
+		
+		$mapper = Mapper::createFor($liteObjectName);
+		
+		$result = [];
+		
+		foreach ($this->asArray() as $item)
+		{
+			$result[] = $mapper->getObject($item, $liteObjectName);
+		}
+		
+		$this->afterExecute();
+		
+		return $result;
+	}
+	
 	/**
 	 * @return string|bool
 	 */

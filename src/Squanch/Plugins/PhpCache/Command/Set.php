@@ -12,7 +12,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Cache\Namespaced\NamespacedCachePool;
 
 use Objection\Mapper;
-use Objection\LiteObject;
 
 
 class Set extends AbstractSet implements ICmdSet
@@ -66,22 +65,7 @@ class Set extends AbstractSet implements ICmdSet
 		$data->Id = $this->getKey();
 		$data->Bucket = $this->getBucket();
 		
-		if ($this->getData() instanceof LiteObject)
-		{
-			$mapper = Mapper::createFor(
-				get_class($this->getData())
-			);
-				
-			$data->Value = $mapper->getJson($this->getData());
-		}
-		else if(is_scalar($this->getData()))
-		{
-			$data->Value = $this->getData();
-		}
-		else
-		{
-			$data->Value = json_encode($this->getData());
-		}
+		$data->Value = $this->getJsonData();
 		
 		$data->setTTL($this->getTTL());
 		

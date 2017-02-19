@@ -2,6 +2,9 @@
 namespace Squanch\AbstractCommand;
 
 
+use Objection\Mapper;
+use Objection\LiteObject;
+
 use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\ICallback;
@@ -65,6 +68,45 @@ abstract class AbstractSet
 	protected function getData()
 	{
 		return $this->data;
+	}
+	
+	protected function getJsonData(): string
+	{
+		$mapperForArrayOfLiteObjects = null;
+		
+		if (is_array($this->getData()))
+		{
+			$data = $this->getData();
+			reset($data);
+			$item = $data[key($data)];
+			
+			if ($item instanceof LiteObject)
+			{
+				$mapperForArrayOfLiteObjects = Mapper::createFor(get_class($item));
+			}
+		}
+		
+		
+		if ($this->getData() instanceof LiteObject)
+		{
+			$mapper = Mapper::createFor(
+				get_class($this->getData())
+			);
+			
+			return $mapper->getJson($this->getData());
+		}
+		else if($mapperForArrayOfLiteObjects)
+		{
+			return $mapperForArrayOfLiteObjects->getJson($this->getData());
+		}
+		else if(is_scalar($this->getData()))
+		{
+			return $this->getData();
+		}
+		else
+		{
+			return json_encode($this->getData());
+		}
 	}
 	
 	

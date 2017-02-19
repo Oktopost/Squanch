@@ -25,6 +25,11 @@ interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWher
 	public function asLiteObject(string $liteObjectName);
 	
 	/**
+	 * @return LiteObject[]|bool
+	 */
+	public function asArrayOfLiteObjects(string $liteObjectName);
+	
+	/**
 	 * @return string|bool
 	 */
 	public function asString();
