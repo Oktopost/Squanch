@@ -77,15 +77,17 @@ abstract class AbstractSet
 		if (is_array($this->getData()))
 		{
 			$data = $this->getData();
-			reset($data);
-			$item = $data[key($data)];
 			
-			if ($item instanceof LiteObject)
+			foreach ($data as $key => $value)
 			{
-				$mapperForArrayOfLiteObjects = Mapper::createFor(get_class($item));
+				if ($value instanceof LiteObject)
+				{
+					$mapperForArrayOfLiteObjects = Mapper::createFor(get_class($value));
+				}
+				
+				break;
 			}
-		}
-		
+		}		
 		
 		if ($this->getData() instanceof LiteObject)
 		{
