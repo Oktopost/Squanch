@@ -95,17 +95,17 @@ class GetTest extends PHPUnit_Framework_TestCase
 	{
 		$key = uniqid();
 		
-		$nested = new myOtherObject();
+		$nested = new myOtherMegaObject();
 		$nested->a = 'b';
-		$obj = new myObject();
+		$obj = new myMegaObject();
 		$obj->Some = 'string';
 		$obj->Nested = $nested;
 		
 		$this->cache->set($key, $obj)->execute();
 		
-		$get = $this->cache->get($key)->asLiteObject(myObject::class);
+		$get = $this->cache->get($key)->asLiteObject(myMegaObject::class);
 		
-		self::assertInstanceOf(myObject::class, $get);
+		self::assertInstanceOf(myMegaObject::class, $get);
 		self::assertEquals($get->Some, 'string');
 		self::assertEquals($get->Nested->a, 'b');
 		$this->cache->delete($key)->execute();
@@ -114,7 +114,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 	public function test_as_array_of_LiteObjects()
 	{
 		$key = uniqid();
-		$obj = new myOtherObject();
+		$obj = new myOtherMegaObject();
 		$obj->a = 'b';
 		$anotherObj = new $obj();
 		$anotherObj->a = 'c';
@@ -123,11 +123,11 @@ class GetTest extends PHPUnit_Framework_TestCase
 		
 		$this->cache->set($key, $array)->execute();
 		
-		$get = $this->cache->get($key)->asArrayOfLiteObjects(myOtherObject::class);
+		$get = $this->cache->get($key)->asArrayOfLiteObjects(myOtherMegaObject::class);
 		
 		foreach ($get as $key => $value)
 		{
-			self::assertInstanceOf(myOtherObject::class, $value);
+			self::assertInstanceOf(myOtherMegaObject::class, $value);
 		}
 		
 		self::assertEquals('b', $get[0]->a);
@@ -166,18 +166,18 @@ class GetTest extends PHPUnit_Framework_TestCase
 	}
 }
 
-class myObject extends LiteObject
+class myMegaObject extends LiteObject
 {
 	protected function _setup()
 	{
 		return [
 			'Some' => LiteSetup::createString(),
-			'Nested' => LiteSetup::createInstanceOf(myOtherObject::class)
+			'Nested' => LiteSetup::createInstanceOf(myOtherMegaObject::class)
 		];
 	}
 }
 
-class myOtherObject extends LiteObject
+class myOtherMegaObject extends LiteObject
 {
 	protected function _setup()
 	{

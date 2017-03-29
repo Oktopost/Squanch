@@ -38,4 +38,9 @@ interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWher
 	 * @return Data|bool
 	 */
 	public function asData();
+	
+	/**
+	 * @return IGetCollection
+	 */
+	public function asCollection($limit = 999);
 }

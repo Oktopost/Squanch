@@ -2,6 +2,8 @@
 namespace dummyStorage\Command;
 
 
+use Squanch\Base\Command\IGetCollection;
+use Squanch\Collection\CollectionHandler;
 use Squanch\Objects\CallbackData;
 use Squanch\Objects\Data;
 use Squanch\Enum\Callbacks;
@@ -19,6 +21,13 @@ class CmdGet extends AbstractGet implements ICmdGet
 	private $executed = false;
 	
 	
+	private function startsWith($haystack, $needle)
+	{
+		$length = strlen($needle);
+		return (substr($haystack, 0, $length) === $needle);
+	}
+
+	
 	protected function executeIfNeed(): bool
 	{
 		if (!$this->executed)
@@ -34,18 +43,64 @@ class CmdGet extends AbstractGet implements ICmdGet
 		return parent::getConnector();
 	}
 	
+	
 	protected function afterExecute()
 	{
 		$this->executed = false;
 		$this->reset();
 	}
-
 	
 	public function resetTTL(int $ttl)
 	{
 		$this->newTTL = $ttl;
 		
 		return $this;
+	}
+	
+	/**
+	 * @return IGetCollection
+	 */
+	public function asCollection($limit = 999)
+	{
+		$result = false;
+		$callbackData = (new CallbackData())->setBucket($this->getBucket());
+		
+		$this->executed = false;
+		$bucket = $this->getBucket();
+		
+		$db = $this->getConnector()->getDb();
+		$data = [];
+		
+		foreach ($db as $key=>$value)
+		{
+			if ($this->startsWith($key, $bucket))
+			{
+				$result = true;
+				/** @var Data $item */
+				$item = $db[$key];
+				
+				if (isset($this->newTTL))
+				{
+					$item->setTTL($this->newTTL);
+					unset($this->newTTL);
+					$db[$key] = $item;
+					$this->getConnector()->setDb($db);
+				}
+				
+				$data[] = $db[$key];
+			}
+		}
+		
+		if ($result)
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
+			
+			return new CollectionHandler($data);
+		}
+	
+		$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+		
+		return new CollectionHandler([]);
 	}
 	
 	public function execute(): bool

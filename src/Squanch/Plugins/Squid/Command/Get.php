@@ -6,6 +6,8 @@ use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdGet;
+use Squanch\Base\Command\IGetCollection;
+use Squanch\Collection\CollectionHandler;
 use Squanch\AbstractCommand\AbstractGet;
 use Squanch\Exceptions\SquanchException;
 
@@ -63,6 +65,74 @@ class Get extends AbstractGet implements ICmdGet
 		$this->executeIfNeed();
 		
 		return $this->data;
+	}
+	
+	/**
+	 * @return IGetCollection
+	 */
+	public function asCollection($limit = 999)
+	{
+		$callbackData = (new CallbackData());
+		
+		$fields = [];
+		
+		if ($this->getKey())
+		{
+			$fields['Id'] = $this->getKey();
+			$callbackData->setKey($this->getKey());
+		}
+		
+		if ($this->getBucket())
+		{
+			$fields['Bucket'] = $this->getBucket();
+			$callbackData->setBucket($this->getBucket());
+		}
+		
+		if (!$fields)
+		{
+			throw new SquanchException('Fields are not set');
+		}
+		
+		/** @var Data[] $query */
+		$query = $this->getConnector()->loadAllByFields($fields, [], $limit);
+		
+		if ($query)
+		{
+			$data = [];
+			$result = false;
+			
+			foreach ($query as $item)
+			{
+				if ($item->EndDate > new \DateTime()) {
+					$data[] = $item;
+					$result = true;
+					
+//					$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
+					
+					$this->data = $item;
+					$this->updateTTLIfNeed();
+					$this->data = null;
+				}
+			}
+			
+			if ($result)
+			{
+				return new CollectionHandler($data);
+				
+			}
+			else
+			{
+				$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			}
+		}
+		else
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+		}
+		
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
+		
+		return new CollectionHandler([]);
 	}
 	
 	public function execute(): bool

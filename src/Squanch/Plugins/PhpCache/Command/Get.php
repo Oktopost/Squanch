@@ -2,13 +2,14 @@
 namespace Squanch\Plugins\PhpCache\Command;
 
 
-use Objection\Mapper;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdGet;
+use Squanch\Base\Command\IGetCollection;
 use Squanch\AbstractCommand\AbstractGet;
 
+use Objection\Mapper;
 use Psr\Cache\CacheItemPoolInterface;
 use Cache\Namespaced\NamespacedCachePool;
 
@@ -69,9 +70,16 @@ class Get extends AbstractGet implements ICmdGet
 		return $this->data;
 	}
 	
+	/**
+	 * @return IGetCollection
+	 */
+	public function asCollection($limit = 999)
+	{
+		throw new \Exception('This method is not implemented for current decorator');
+	}
+	
 	public function execute(): bool
 	{
-		
 		$result = false;
 		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
 		

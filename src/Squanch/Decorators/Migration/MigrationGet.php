@@ -4,13 +4,15 @@ namespace Squanch\Decorators\Migration;
 
 use Objection\LiteObject;
 
+use Squanch\Collection\CollectionHandler;
 use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 
 use Squanch\Base\ICachePlugin;
-use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Boot\ICallbacksLoader;
+use Squanch\Base\Command\ICmdGet;
+use Squanch\Base\Command\IGetCollection;
 
 
 class MigrationGet implements ICmdGet
@@ -110,6 +112,14 @@ class MigrationGet implements ICmdGet
 		$this->executed = true;
 		
 		return $result;
+	}
+	
+	/**
+	 * @return IGetCollection
+	 */
+	public function asCollection($limit = 999)
+	{
+		return new CollectionHandler([]);
 	}
 	
 	/**
