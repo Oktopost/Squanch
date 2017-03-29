@@ -118,9 +118,10 @@ class SetTest extends PHPUnit_Framework_TestCase
 		
 		$result = $this->cache->get($key)->asData();
 		$interval = TTL::FOREVER;
+		$t = $result->Created->modify("+ {$interval} seconds");
 		
 		self::assertLessThan(0, $result->TTL);
-		self::assertEquals($result->Created->modify("+ {$interval} seconds"), $result->EndDate);
+		self::assertGreaterThanOrEqual($t, $result->EndDate);
 		$this->cache->delete($key)->execute();
 	}
 	

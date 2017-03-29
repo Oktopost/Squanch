@@ -45,7 +45,9 @@ class GetCollectionTest extends PHPUnit_Framework_TestCase
 		$this->cache->set($key2, uniqid(), $bucket)->execute();
 		$this->cache->set($key3, uniqid(), $bucket)->execute();
 		
-		$result = $this->cache->get()->byBucket($bucket)->asCollection()->asArrayOfData();
+		$collection = $this->cache->get()->byBucket($bucket)->asCollection();
+		
+		$result = $collection->asArrayOfData();
 		self::assertCount(3, $result);
 	}
 	
@@ -84,9 +86,10 @@ class GetCollectionTest extends PHPUnit_Framework_TestCase
 			return;
 		
 		$key = uniqid();
+		$key2 = uniqid();
 		$bucket = uniqid();
 		$this->cache->set($key, 'b', $bucket)->setTTL(10)->execute();
-		$this->cache->set($key, 'b', $bucket)->setTTL(10)->execute();
+		$this->cache->set($key2, 'b', $bucket)->setTTL(10)->execute();
 		
 		$get = $this->cache->get()->byBucket($bucket)->asCollection()->asArrayOfData();
 		self::assertLessThanOrEqual(10, $get[0]->TTL);

@@ -52,13 +52,30 @@ class Config
 	private function initMigrationInstance()
 	{
 		$instanceA = $this->initSquidInstance('HardCache');
-		$instanceB = $this->initSquidInstance('SoftCache', 'squid_soft');
+//		$instanceB = $this->initSquidInstance('SoftCache', 'squid_soft');
+		$instanceB = $this->initPredisInstance();
 		
 		$plugin = new Squanch\Decorators\Migration\MigrationDecorator($instanceA->Plugin, $instanceB->Plugin);
 		
 		$instance = new Instance();
 		$instance->Name = 'migration';
 		$instance->Type = InstanceType::HARD;
+		$instance->Plugin = $plugin;
+		
+		return $instance;
+	}
+	
+	private function initPredisInstance()
+	{
+		$instance = new Client(array(
+			"scheme" => "tcp",
+			"host" => "127.0.0.1",
+			"port" => 6379));
+		
+		$plugin = new Squanch\Plugins\Predis\PredisPlugin($instance);
+		$instance = new Instance();
+		$instance->Name = 'predis';
+		$instance->Type = InstanceType::SOFT;
 		$instance->Plugin = $plugin;
 		
 		return $instance;
@@ -127,6 +144,7 @@ class Config
 		$configLoader->addInstance($this->initSquidInstance('SoftCache', 'squidSoft'));
 		$configLoader->addInstance($this->initMigrationInstance());
 		$configLoader->addInstance($this->initRedisInstance());
+		$configLoader->addInstance($this->initPredisInstance());
 		
 		/** @var IBoot $squanch */
 		$squanch = Squanch::skeleton(IBoot::class);
@@ -138,6 +156,7 @@ class Config
 			'squidSoft' => $squanch->resetFilters()->filterInstancesByName('squidSoft')->getPlugin(),
 			'migration' => $squanch->resetFilters()->filterInstancesByName('migration')->getPlugin(),
 		    'redis' => $squanch->resetFilters()->filterInstancesByName('redis')->getPlugin(),
+		    'predis' => $squanch->resetFilters()->filterInstancesByName('predis')->getPlugin()
 		];
 		
 		$this->plugin = $squanch->resetFilters()->filterInstancesByName($instanceName)->getPlugin();

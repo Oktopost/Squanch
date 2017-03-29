@@ -42,8 +42,9 @@
         "test": "bash test.sh"
     },
     "suggest": {
-        "cache/cache": "Use Redis (or any other cache/cache) adapter for storing cache",
-        "oktopost/squid": "Use mysql for storing cache"
+        "predis/predis": "Use predis for storing cache",
+        "oktopost/squid": "Use mysql for storing cache",
+        "cache/cache": "Use Redis (or any other cache/cache) adapter for storing cache"
     },
     "minimum-stability": "stable"
 }

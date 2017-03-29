@@ -29,7 +29,7 @@ class MigrationTest extends PHPUnit_Framework_TestCase
 		$allPlugins = (new Config())->getAllPlugins();
 		$this->migrationPlugin = $allPlugins['migration'];
 		$this->squidHardCachePlugin = $allPlugins['squid'];
-		$this->squidSoftCachePlugin = $allPlugins['squidSoft'];
+		$this->squidSoftCachePlugin = $allPlugins['predis'];
 	}
 	
 	public function test_migration()

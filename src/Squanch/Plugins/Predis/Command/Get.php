@@ -1,17 +1,16 @@
 <?php
-namespace Squanch\Plugins\PhpCache\Command;
+namespace Squanch\Plugins\Predis\Command;
 
-
-use Squanch\Objects\Data;
-use Squanch\Objects\CallbackData;
-use Squanch\Enum\Callbacks;
-use Squanch\Base\Command\ICmdGet;
-use Squanch\Base\Command\IGetCollection;
-use Squanch\AbstractCommand\AbstractGet;
 
 use Objection\Mapper;
-use Psr\Cache\CacheItemPoolInterface;
-use Cache\Namespaced\NamespacedCachePool;
+use Predis\Client;
+use Squanch\AbstractCommand\AbstractGet;
+use Squanch\Base\Command\ICmdGet;
+use Squanch\Base\Command\IGetCollection;
+use Squanch\Collection\CollectionHandler;
+use Squanch\Enum\Callbacks;
+use Squanch\Objects\CallbackData;
+use Squanch\Objects\Data;
 
 
 class Get extends AbstractGet implements ICmdGet
@@ -29,15 +28,14 @@ class Get extends AbstractGet implements ICmdGet
 		{
 			$this->data->setTTL($this->newTTL);
 			$mapper = Mapper::createFor(Data::class);
-			$json = $mapper->getObject($this->data);
-			$bucket = new NamespacedCachePool($this->getConnector(), $this->getBucket());
-			$bucket->getItem($this->getKey())->set($json)->expiresAt($this->newTTL);
+			$json = $mapper->getJson($this->data);
+			$this->getConnector()->hset($this->getBucket(), $this->getKey(), $json);
 			unset($this->newTTL);
 		}
 	}
 	
 	
-	protected function getConnector(): CacheItemPoolInterface
+	protected function getConnector(): Client
 	{
 		return parent::getConnector();
 	}
@@ -75,27 +73,46 @@ class Get extends AbstractGet implements ICmdGet
 	 */
 	public function asCollection($limit = 999)
 	{
-		throw new \Exception('This method is not implemented for current plugin');
+		$mapper = Mapper::createFor(Data::class);
+		$data = $mapper->getObjects($this->getConnector()->hgetall($this->getBucket()));
+		
+		if ($this->newTTL)
+		{
+			foreach ($data as $item)
+			{
+				$this->data = $item;
+				$this->updateTTLIfNeed();
+				$this->data = null;
+			}
+		}
+		
+		return new CollectionHandler($data);
 	}
 	
 	public function execute(): bool
 	{
 		$result = false;
+		
 		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
 		
-		$bucket = new NamespacedCachePool($this->getConnector(), $this->getBucket());
+		$callbackData->setKey($this->getKey());
+		$callbackData->setBucket($this->getBucket());
 		
-		$item = $bucket->getItem($this->getKey());
+		$item = $this->getConnector()->hget($this->getBucket(), $this->getKey());
 		
-		if ($item->isHit())
+		if ($item)
 		{
 			$mapper = Mapper::createFor(Data::class);
 			
-			$this->data = $mapper->getObject($item->get());
+			$this->data = $mapper->getObject($item);
 			
-			if ($this->data->TTL > 0)
+			if ($this->data->EndDate < new \DateTime())
 			{
-				$this->data->TTL = $this->data->EndDate->diff(new \DateTime())->format('%s');
+				$this->getConnector()->hdel($this->getBucket(), [$this->getKey()]);
+				$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+				$this->data = null;
+				
+				return false;
 			}
 			
 			$result = true;
