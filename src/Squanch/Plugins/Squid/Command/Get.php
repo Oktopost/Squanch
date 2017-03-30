@@ -107,8 +107,6 @@ class Get extends AbstractGet implements ICmdGet
 					$data[] = $item;
 					$result = true;
 					
-//					$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
-					
 					$this->data = $item;
 					$this->updateTTLIfNeed();
 					$this->data = null;
@@ -117,22 +115,25 @@ class Get extends AbstractGet implements ICmdGet
 			
 			if ($result)
 			{
-				return new CollectionHandler($data);
+				$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
+				$result = new CollectionHandler($data);
 				
 			}
 			else
 			{
 				$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+				$result = new CollectionHandler([]);
 			}
 		}
 		else
 		{
 			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$result = new CollectionHandler([]);
 		}
 		
 		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
 		
-		return new CollectionHandler([]);
+		return $result;
 	}
 	
 	public function execute(): bool

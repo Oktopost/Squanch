@@ -172,6 +172,23 @@ class GetCollectionTest extends PHPUnit_Framework_TestCase
 		self::assertEquals('b',$get[0]->Nested->a);
 		$this->cache->delete()->byBucket($bucket)->execute();
 	}
+	
+	public function test_collection_expiration()
+	{
+		if (!$this->checkInstance())
+			return;
+		
+		$bucket = uniqid();
+		$key1 = uniqid();
+		
+		$this->cache->set($key1, uniqid(), $bucket)->setTTL(0)->execute();
+		sleep(1);
+		
+		$get = $this->cache->get()->byBucket($bucket)->asCollection();
+		
+		self::assertEmpty($get->asStrings());
+		
+	}
 }
 
 class myObject extends LiteObject

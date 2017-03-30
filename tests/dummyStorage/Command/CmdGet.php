@@ -70,6 +70,7 @@ class CmdGet extends AbstractGet implements ICmdGet
 		
 		$db = $this->getConnector()->getDb();
 		$data = [];
+		$now = new \DateTime();
 		
 		foreach ($db as $key=>$value)
 		{
@@ -78,6 +79,12 @@ class CmdGet extends AbstractGet implements ICmdGet
 				$result = true;
 				/** @var Data $item */
 				$item = $db[$key];
+				
+				if($item->EndDate <= $now)
+				{
+					unset($db[$key]);
+					continue;
+				}
 				
 				if (isset($this->newTTL))
 				{

@@ -22,14 +22,17 @@ class Get extends AbstractGet implements ICmdGet
 	private $executed = false;
 	
 	
-	private function updateTTLIfNeed()
+	private function updateTTLIfNeed(string $key = null)
 	{
 		if (isset($this->newTTL))
 		{
+			if (!$key)
+				$key = $this->getKey();
+			
 			$this->data->setTTL($this->newTTL);
 			$mapper = Mapper::createFor(Data::class);
 			$json = $mapper->getJson($this->data);
-			$this->getConnector()->hset($this->getBucket(), $this->getKey(), $json);
+			$this->getConnector()->hset($this->getBucket(), $key, $json);
 			unset($this->newTTL);
 		}
 	}
@@ -73,20 +76,61 @@ class Get extends AbstractGet implements ICmdGet
 	 */
 	public function asCollection($limit = 999)
 	{
-		$mapper = Mapper::createFor(Data::class);
-		$data = $mapper->getObjects($this->getConnector()->hgetall($this->getBucket()));
+		$callbackData = (new CallbackData())->setBucket($this->getBucket());
 		
-		if ($this->newTTL)
+		$mapper = Mapper::createFor(Data::class);
+		
+		/** @var Data[] $data */
+		$data = $mapper->getObjects($this->getConnector()->hgetall($this->getBucket()));
+		$now = new \DateTime();
+		$toDel = [];
+		$i = 0;
+		
+		foreach ($data as $key=>$item)
 		{
-			foreach ($data as $item)
+			if ($i == $limit)
 			{
-				$this->data = $item;
-				$this->updateTTLIfNeed();
-				$this->data = null;
+				break;
 			}
+			
+			if ($item->EndDate <= $now)
+			{
+				$toDel[] = $item->Id;
+				unset($data[$key]);
+				continue;
+			}
+			
+			$this->data = $item;
+			$this->updateTTLIfNeed($item->Id);
+			$this->data = null;
+			
+			$i++;
 		}
 		
-		return new CollectionHandler($data);
+		if ($toDel)
+		{
+			$this->getConnector()->hdel($this->getBucket(), $toDel);
+			
+			if (!$this->getConnector()->hkeys($this->getBucket()))
+			{
+				$this->getConnector()->del([$this->getBucket()]);
+			}
+		}
+	
+		if ($data)
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
+			$result = new CollectionHandler($data);
+		}
+		else
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$result = new CollectionHandler([]);
+		}
+		
+		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
+		
+		return $result;
 	}
 	
 	public function execute(): bool
