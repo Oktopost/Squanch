@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `HardCache` (
     `Bucket` varchar(255) NOT NULL,
     `Value` longtext NOT NULL,
     `EndDate` datetime NOT NULL,
-    `Created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `Modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `TTL` int(11) NOT NULL,
 
