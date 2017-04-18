@@ -1,4 +1,4 @@
-CREATE TABLE `HardCache` (
+CREATE TABLE IF NOT EXISTS `HardCache` (
     `Id` varchar(255) NOT NULL,
     `Bucket` varchar(255) NOT NULL,
     `Value` longtext NOT NULL,
