@@ -10,6 +10,7 @@ services:
   - redis-server
 
 before_install:  
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS squanch_cache;'
   - mysql -u root --default-character-set=utf8 squanch_cache < db/mysql.sql
   
 before_script:
