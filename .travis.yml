@@ -17,4 +17,4 @@ before_script:
   - composer install --prefer-source --no-interaction --dev
   
 script:
-  - test.sh
+  - composer test
