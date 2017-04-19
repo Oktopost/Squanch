@@ -1,3 +1,5 @@
+dist: trusty
+sudo: required
 language: php
 php:
   - '7.0'
@@ -5,9 +7,9 @@ php:
   
 services:
   - mysql
+  - redis-server
 
-before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS squanch_cache;'  
+before_install:  
   - mysql -u root --default-character-set=utf8 squanch_cache < db/mysql.sql
   
 before_script:
