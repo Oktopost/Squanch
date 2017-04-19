@@ -14,7 +14,7 @@ before_install:
   - mysql -u root --default-character-set=utf8 squanch_cache < db/mysql.sql
   
 before_script:
-  - composer install --prefer-source --no-interaction --dev
+  - composer install --prefer-source --no-interaction
   
 script:
   - composer test
