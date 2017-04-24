@@ -13,9 +13,11 @@ use Squanch\Enum\Callbacks;
 abstract class AbstractDelete implements ICmdDelete
 {
 	private $connector;
-	private $callbacksLoader;
 	private $key;
 	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
+	
+	/** @var ICallbacksLoader */
+	private $callbacksLoader;
 	
 	
 	protected function getConnector()
@@ -80,7 +82,7 @@ abstract class AbstractDelete implements ICmdDelete
 	 */
 	public function onSuccess($onSuccess)
 	{
-		$this->getCallbacksLoader()->addCallback(Callbacks::SUCCESS_ON_DELETE, $onSuccess);
+		$this->callbacksLoader->addCallback(Callbacks::SUCCESS_ON_DELETE, $onSuccess);
 		return $this;
 	}
 	
@@ -90,7 +92,7 @@ abstract class AbstractDelete implements ICmdDelete
 	 */
 	public function onFail($onFail)
 	{
-		$this->getCallbacksLoader()->addCallback(Callbacks::FAIL_ON_DELETE, $onFail);
+		$this->callbacksLoader->addCallback(Callbacks::FAIL_ON_DELETE, $onFail);
 		return $this;
 	}
 	
@@ -100,7 +102,7 @@ abstract class AbstractDelete implements ICmdDelete
 	 */
 	public function onComplete($onComplete)
 	{
-		$this->getCallbacksLoader()->addCallback(Callbacks::ON_DELETE, $onComplete);
+		$this->callbacksLoader->addCallback(Callbacks::ON_DELETE, $onComplete);
 		return $this;
 	}
 }
