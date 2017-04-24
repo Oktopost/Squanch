@@ -135,7 +135,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$result = $this->cache->get($key)->asData();
 		
 		self::assertEquals($interval, $result->TTL);
-		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate);
+		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate, '', 0.999999);
 		$this->cache->delete($key)->execute();
 	}
 	
