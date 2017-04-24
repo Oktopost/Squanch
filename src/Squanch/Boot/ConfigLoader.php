@@ -51,6 +51,7 @@ class ConfigLoader implements IConfigLoader
 		{
 			throw new SquanchUnknownCallbackException();
 		}
+		
 		return $this;
 	}
 	

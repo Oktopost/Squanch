@@ -101,14 +101,21 @@ class Get extends AbstractGet implements ICmdGet
 			$result = true;
 			$callbackData->setData($this->data);
 			
-			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
-			
 			$this->updateTTLIfNeed();
 		}
 		else
 		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
+			
 			$this->data = null;
+		}
+		
+		if ($item->isHit())
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
+		}
+		else
+		{
+			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 		}
 		
 		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);

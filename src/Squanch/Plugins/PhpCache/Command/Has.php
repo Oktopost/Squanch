@@ -48,7 +48,6 @@ class Has extends AbstractHas implements ICmdHas
 		{
 			$this->updateTTLIfNeed();
 			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
-			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
 		}
 		else
 		{

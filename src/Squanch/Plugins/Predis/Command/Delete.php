@@ -21,6 +21,9 @@ class Delete extends AbstractDelete implements ICmdDelete
 	
 	public function execute(): bool
 	{
+		if (!$this->getKey() && !$this->getBucket())
+			throw new SquanchException('Fields not set');
+		
 		$callbackData = new CallbackData();
 		
 		if ($this->getKey())
@@ -31,11 +34,6 @@ class Delete extends AbstractDelete implements ICmdDelete
 		if ($this->getBucket())
 		{
 			$callbackData->setBucket($this->getBucket());
-		}
-		
-		if (!$this->getKey() && !$this->getBucket())
-		{
-			throw new SquanchException('Fields not set');
 		}
 		
 		$result = false;

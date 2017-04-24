@@ -122,6 +122,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 		
 		self::assertLessThan(0, $result->TTL);
 		self::assertGreaterThanOrEqual($t, $result->EndDate);
+		
 		$this->cache->delete($key)->execute();
 	}
 	

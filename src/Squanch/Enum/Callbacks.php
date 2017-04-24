@@ -2,12 +2,10 @@
 namespace Squanch\Enum;
 
 
-use Objection\TEnum;
-
-
 class Callbacks
 {
-	use TEnum;
+	use \Objection\TEnum;
+	
 	
 	const SUCCESS_ON_GET 	= 'successOnGet';
 	const MISS_ON_GET    	= 'missOnGet';
@@ -24,5 +22,4 @@ class Callbacks
 	const SUCCESS_ON_DELETE = 'successOnDelete';
 	const FAIL_ON_DELETE    = 'failOnDelete';
 	const ON_DELETE			= 'onDelete';
-	
 }
