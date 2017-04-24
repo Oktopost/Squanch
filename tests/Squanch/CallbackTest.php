@@ -6,6 +6,7 @@ use Squanch\Base\ICachePlugin;
 
 use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
+use Squanch\Enum\Callbacks;
 use Squanch\Objects\CallbackData;
 
 
@@ -24,6 +25,48 @@ class CallbackTest extends PHPUnit_Framework_TestCase
 		$this->cache = (new Config())->getPlugin();
 	}
 	
+	public function test_global_callback_executes()
+	{
+		$increment = 0;
+		
+		$loader = $this->cache->getCallbacksLoader();
+		$loader->addGlobalCallback(Callbacks::SUCCESS_ON_GET, function() use(&$increment){
+			$increment++;
+		});
+		
+		$id = uniqid();
+		$this->cache->set($id, 'test')->execute();
+		
+		$this->cache->get($id)->execute();
+		$this->cache->get($id)->execute();
+		$this->cache->get($id)->execute();
+		
+		self::assertEquals(3, $increment);
+		
+		$this->cache->delete($id)->execute();
+	}
+	
+	public function test_runtime_callback_prevents_global_callback()
+	{
+		$increment = 1;
+		
+		$loader = $this->cache->getCallbacksLoader();
+		$loader->addGlobalCallback(Callbacks::SUCCESS_ON_GET, function() use(&$increment){
+			$increment++;
+		});
+		
+		$id = uniqid();
+		$this->cache->set($id, 'test')->execute();
+		
+		$this->cache->get($id)->onSuccess(function() use(&$increment){
+			$increment--;
+			return false;
+		})->execute();
+		
+		self::assertEquals(0, $increment);
+		
+		$this->cache->delete($id);
+	}
 	
 	public function test_callback_as_string_executes()
 	{

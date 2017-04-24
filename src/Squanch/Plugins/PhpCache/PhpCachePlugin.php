@@ -18,6 +18,7 @@ class PhpCachePlugin extends AbstractPlugin implements ICachePlugin
 	private $connector;
 	
 	
+	
 	protected function getConnector()
 	{
 		return $this->connector;

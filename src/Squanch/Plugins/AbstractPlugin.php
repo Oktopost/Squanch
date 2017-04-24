@@ -34,6 +34,11 @@ abstract class AbstractPlugin implements ICachePlugin
 		return $this;
 	}
 	
+	public function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbacksLoader;
+	}
+	
 	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
 		$result= $this->getCmdDelete()->setup($this->getConnector(), $this->callbacksLoader);

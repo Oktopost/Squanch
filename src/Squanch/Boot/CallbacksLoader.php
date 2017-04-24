@@ -13,30 +13,12 @@ class CallbacksLoader implements ICallbacksLoader
 	private $callbacks = [];
 	
 	
-	private function addGlobalCallback(string $callbackType, $callback)
-	{
-		if (!isset($this->globalCallbacks[$callbackType]))
-		{
-			$this->globalCallbacks[$callbackType] = [];
-		}
-		
-		$this->globalCallbacks[$callbackType][] = $callback;
-	}
-	
-	private function addRunTimeCallback(string $callbackType, $callback)
-	{
-		if (!isset($this->callbacks[$callbackType]))
-		{
-			$this->callbacks[$callbackType] = [];
-		}
-		
-		$this->callbacks[$callbackType][] = $callback;
-	}
-	
-	private function execute(array $callbacks, CallbackData $data)
+	private function execute(array $callbacks, CallbackData $data): bool
 	{
 		foreach ($callbacks as $callback)
 		{
+			$result = true;
+			
 			if (is_string($callback))
 			{
 				$callback = new $callback();
@@ -46,42 +28,60 @@ class CallbacksLoader implements ICallbacksLoader
 			{
 				/** @var ICallback $impl */
 				$impl = new $callback();
-				$impl->fire($data);
+				$result = $impl->fire($data);
 			}
 			else if ($callback instanceof \Closure)
 			{
-				call_user_func($callback, $data);
+				$result = call_user_func($callback, $data);
+			}
+			
+			if (!is_null($result) && $result == false)
+			{
+				return false;
 			}
 		}
+		
+		return true;
 	}
 	
 	
-	/**
-	 * @param ICallback[]|\Closure[] $callbacks
-	 */
-	public function addCallback(string $callbackType, $callback, $isGlobal = false)
+	public function addGlobalCallback(string $callbackType, $callback)
 	{
-		if ($isGlobal)
+		if (!isset($this->globalCallbacks[$callbackType]))
 		{
-			$this->addGlobalCallback($callbackType, $callback);
+			$this->globalCallbacks[$callbackType] = [];
 		}
-		else
-		{
-			$this->addRunTimeCallback($callbackType, $callback);
-		}
+		
+		$this->globalCallbacks[$callbackType][] = $callback;
 	}
+	
+	public function addCallback(string $callbackType, $callback)
+	{
+		if (!isset($this->callbacks[$callbackType]))
+		{
+			$this->callbacks[$callbackType] = [];
+		}
+		
+		$this->callbacks[$callbackType][] = $callback;
+	}
+	
 	
 	public function executeCallback(string $callbackType, CallbackData $data)
 	{
+		if (isset($this->callbacks[$callbackType]))
+		{
+			$execute = $this->execute($this->callbacks[$callbackType], $data);
+			$this->callbacks[$callbackType] = [];
+			
+			if (!$execute)
+			{
+				return;
+			}
+		}
+
 		if (isset($this->globalCallbacks[$callbackType]))
 		{
 			$this->execute($this->globalCallbacks[$callbackType], $data);
-		}
-		
-		if (isset($this->callbacks[$callbackType]))
-		{
-			$this->execute($this->callbacks[$callbackType], $data);
-			$this->callbacks[$callbackType] = [];
 		}
 	}
 }

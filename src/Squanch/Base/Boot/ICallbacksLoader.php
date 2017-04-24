@@ -9,10 +9,14 @@ use Squanch\Objects\CallbackData;
 interface ICallbacksLoader
 {
 	/**
-	 * @param string $callbackType
 	 * @param ICallback|\Closure $callback
 	 */
-	public function addCallback(string $callbackType, $callback, $isGlobal = false);
+	public function addCallback(string $callbackType, $callback);
+	
+	/**
+	 * @param ICallback|\Closure $callback
+	 */
+	public function addGlobalCallback(string $callbackType, $callback);
 	
 	public function executeCallback(string $callbackType, CallbackData $data);
 }

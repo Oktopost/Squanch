@@ -14,6 +14,8 @@ interface ICachePlugin
 {
 	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin;
 	
+	public function getCallbacksLoader(): ICallbacksLoader;
+	
 	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete;
 	
 	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet;

@@ -36,6 +36,11 @@ class MigrationDecorator implements ICachePlugin
 		return $this;
 	}
 	
+	public function getCallbacksLoader(): ICallbacksLoader
+	{
+		return $this->callbackLoader;
+	}
+	
 	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
 		return $this->main->delete($key, $bucketName);

@@ -88,7 +88,9 @@ class MigrationGet implements ICmdGet
 		$callbackData = new CallbackData();
 		$callbackData->setKey($this->key)->setBucket($this->bucket);
 		
-		if (!$this->executeMain())
+		$result = $this->executeMain();
+		
+		if (!$result)
 		{
 			$result = $this->executeFallback();
 		}
@@ -96,20 +98,8 @@ class MigrationGet implements ICmdGet
 		{
 			$result = true;
 		}
-		
-		if ($result)
-		{
-			$callbackData->Data = $this->get->asData();
-			$this->callbackLoader->executeCallback(Callbacks::SUCCESS_ON_GET, $callbackData);
-		}
-		else
-		{
-			$this->callbackLoader->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
-		}
-		
-		$this->callbackLoader->executeCallback(Callbacks::ON_GET, $callbackData);
-		
-		$this->executed = true;
+
+		$this->executed = $result;
 		
 		return $result;
 	}
