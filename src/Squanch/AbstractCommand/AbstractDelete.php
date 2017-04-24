@@ -3,13 +3,14 @@ namespace Squanch\AbstractCommand;
 
 
 use Squanch\Base\ICallback;
+use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
 
 
-abstract class AbstractDelete
+abstract class AbstractDelete implements ICmdDelete
 {
 	private $connector;
 	private $callbacksLoader;

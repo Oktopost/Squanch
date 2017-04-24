@@ -5,10 +5,11 @@ namespace Squanch\AbstractCommand;
 use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\ICallback;
+use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
-abstract class AbstractHas
+abstract class AbstractHas implements ICmdHas
 {
 	private $connector;
 	private $callbacksLoader;

@@ -6,13 +6,14 @@ use Squanch\Objects\Data;
 use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\ICallback;
+use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 use Objection\Mapper;
 use Objection\LiteObject;
 
 
-abstract class AbstractGet
+abstract class AbstractGet implements ICmdGet
 {
 	private $connector;
 	private $callbacksLoader;

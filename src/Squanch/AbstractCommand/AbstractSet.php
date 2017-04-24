@@ -8,10 +8,11 @@ use Objection\LiteObject;
 use Squanch\Enum\Bucket;
 use Squanch\Enum\Callbacks;
 use Squanch\Base\ICallback;
+use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Boot\ICallbacksLoader;
 
 
-abstract class AbstractSet
+abstract class AbstractSet implements ICmdSet
 {
 	private $connector;
 	private $callbacksLoader;
