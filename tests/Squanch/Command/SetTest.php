@@ -133,9 +133,10 @@ class SetTest extends PHPUnit_Framework_TestCase
 		$this->cache->set($key, 'data')->setTTL($interval)->execute();
 		
 		$result = $this->cache->get($key)->asData();
+		$t = (new \DateTime())->modify("+ {$interval} seconds")->getTimestamp();
 		
 		self::assertEquals($interval, $result->TTL);
-		self::assertEquals((new \DateTime())->modify("+ {$interval} seconds"), $result->EndDate, '', 0.999999);
+		self::assertEquals($t, $result->EndDate->getTimestamp());
 		$this->cache->delete($key)->execute();
 	}
 	
