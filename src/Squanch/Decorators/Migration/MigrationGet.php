@@ -220,13 +220,19 @@ class MigrationGet implements ICmdGet
 	
 	public function onFail($onFail)
 	{
-		$this->callbackLoader->addCallback(Callbacks::FAIL_ON_GET, $onFail);
+		$this->callbackLoader->addCallback(Callbacks::MISS_ON_GET, $onFail);
 		return $this;
 	}
 	
 	public function onComplete($onComplete)
 	{
 		$this->callbackLoader->addCallback(Callbacks::ON_GET, $onComplete);
+		return $this;
+	}
+	
+	public function onMiss($callback)
+	{
+		$this->callbackLoader->addCallback(Callbacks::MISS_ON_GET, $callback);
 		return $this;
 	}
 }

@@ -105,7 +105,7 @@ class CmdGet extends AbstractGet implements ICmdGet
 			return new CollectionHandler($data);
 		}
 	
-		$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+		$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 		
 		return new CollectionHandler([]);
 	}
@@ -144,7 +144,7 @@ class CmdGet extends AbstractGet implements ICmdGet
 		}
 		else
 		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 			
 			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_GET, $callbackData);
 			

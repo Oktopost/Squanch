@@ -9,9 +9,9 @@ class Callbacks
 {
 	use TEnum;
 	
-	const SUCCESS_ON_GET    = 'successOnGet';
-	const FAIL_ON_GET		= 'failOnGet';
-	const ON_GET			= 'onGet';
+	const SUCCESS_ON_GET 	= 'successOnGet';
+	const MISS_ON_GET    	= 'missOnGet';
+	const ON_GET         	= 'onGet';
 
 	const SUCCESS_ON_HAS    = 'successOnHas';
 	const FAIL_ON_HAS		= 'failOnHas';

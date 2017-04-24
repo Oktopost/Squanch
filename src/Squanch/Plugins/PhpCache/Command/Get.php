@@ -10,8 +10,8 @@ use Squanch\Base\Command\IGetCollection;
 use Squanch\AbstractCommand\AbstractGet;
 
 use Objection\Mapper;
-use Psr\Cache\CacheItemPoolInterface;
 use Cache\Namespaced\NamespacedCachePool;
+use Cache\Hierarchy\HierarchicalPoolInterface;
 
 
 class Get extends AbstractGet implements ICmdGet
@@ -37,7 +37,7 @@ class Get extends AbstractGet implements ICmdGet
 	}
 	
 	
-	protected function getConnector(): CacheItemPoolInterface
+	protected function getConnector(): HierarchicalPoolInterface
 	{
 		return parent::getConnector();
 	}
@@ -107,7 +107,7 @@ class Get extends AbstractGet implements ICmdGet
 		}
 		else
 		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 			$this->data = null;
 		}
 		

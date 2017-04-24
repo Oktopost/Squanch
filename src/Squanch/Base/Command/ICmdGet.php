@@ -7,7 +7,7 @@ use Squanch\Objects\Data;
 use Objection\LiteObject;
 
 
-interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL
+interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL, ICmdGetCallback
 {
 	/**
 	 * @return array|bool

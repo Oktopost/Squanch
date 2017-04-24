@@ -105,7 +105,7 @@ abstract class AbstractGet implements ICmdGet
 	 */
 	public function onFail($onFail)
 	{
-		$this->getCallbacksLoader()->addCallback(Callbacks::FAIL_ON_GET, $onFail);
+		$this->getCallbacksLoader()->addCallback(Callbacks::MISS_ON_GET, $onFail);
 		return $this;
 	}
 	
@@ -116,6 +116,16 @@ abstract class AbstractGet implements ICmdGet
 	public function onComplete($onComplete)
 	{
 		$this->getCallbacksLoader()->addCallback(Callbacks::ON_GET, $onComplete);
+		return $this;
+	}
+	
+	/**
+	 * @param \Closure|ICallback $callback
+	 * @return static
+	 */
+	public function onMiss($callback)
+	{
+		$this->getCallbacksLoader()->addCallback(Callbacks::MISS_ON_GET, $callback);
 		return $this;
 	}
 	

@@ -121,13 +121,13 @@ class Get extends AbstractGet implements ICmdGet
 			}
 			else
 			{
-				$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+				$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 				$result = new CollectionHandler([]);
 			}
 		}
 		else
 		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 			$result = new CollectionHandler([]);
 		}
 		
@@ -173,7 +173,7 @@ class Get extends AbstractGet implements ICmdGet
 		}
 		else
 		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_GET, $callbackData);
+			$this->getCallbacksLoader()->executeCallback(Callbacks::MISS_ON_GET, $callbackData);
 			$this->data = null;
 		}
 		
