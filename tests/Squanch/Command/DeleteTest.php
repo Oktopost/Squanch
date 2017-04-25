@@ -25,7 +25,7 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	
 	public function test_delete_return_true()
 	{
-		$this->cache->set('a', 'b')->execute();
+		$this->cache->set('a', 'b')->save();
 		$result = $this->cache->delete('a')->execute();
 		self::assertTrue($result);
 	}

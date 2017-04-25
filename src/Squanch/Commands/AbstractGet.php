@@ -15,12 +15,11 @@ use Objection\LiteObject;
 
 abstract class AbstractGet implements ICmdGet
 {
-	use \Squanch\Commands\Helpers\TWhere;
+	use \Squanch\Commands\Traits\TWhere;
 	use \Squanch\Commands\Traits\TResetTTL;
 	
 	
 	private $connector;
-	private $onMiss = null;
 	
 	/** @var CallbacksHandler */
 	private $callbacksHandler;
@@ -39,6 +38,12 @@ abstract class AbstractGet implements ICmdGet
 		$result = $this->onGet($data);
 		$this->callbacksHandler->onGetRequest(is_null($result), $data);
 		
+		if ($result && $this->hasTTL())
+		{
+			$result->setTTL($this->getTTL());
+			$this->onUpdateTTL($data, $this->getTTL());
+		}
+		
 		return !is_null($result);
 	}
 	
@@ -54,6 +59,8 @@ abstract class AbstractGet implements ICmdGet
 	 * @return Data|null
 	 */
 	protected abstract function onGet(CallbackData $data);
+	
+	protected abstract function onUpdateTTL(CallbackData $data, int $newTTL);
 	
 	
 	/**

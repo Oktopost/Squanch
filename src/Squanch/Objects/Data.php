@@ -59,13 +59,30 @@ class Data extends LiteObject
 	}
 	
 	
-	public function serialize(): \stdClass
+	public function serialize(): string 
 	{
 		$mapper = Mapper::createFor(Data::class);
-		return $mapper->getStdClass($this);
+		return $mapper->getJson($this);
 	}
 	
-	public static function deserialize(\stdClass $data): Data
+	public function serializeToArray(): array 
+	{
+		return [
+			'Id'       => $this->Id,
+			'Bucket'   => $this->Bucket,
+			'Value'    => $this->Value,
+			'TTL'      => (string)$this->TTL,
+			'EndDate'  => (string)$this->EndDate->getTimestamp(),
+			'Created'  => (string)$this->Created->getTimestamp(),
+			'Modified' => (string)$this->Modified->getTimestamp()
+		];
+	}
+
+	/**
+	 * @param array|\stdClass|string $data
+	 * @return Data
+	 */
+	public static function deserialize($data): Data
 	{
 		$mapper = Mapper::createFor(Data::class);
 		

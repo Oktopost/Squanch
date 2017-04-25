@@ -2,63 +2,24 @@
 namespace Squanch\Plugins\PhpCache\Command;
 
 
-use Squanch\Enum\Callbacks;
-use Squanch\Objects\CallbackData;
-use Squanch\Base\Command\ICmdDelete;
-use Squanch\AbstractCommand\AbstractDelete;
-
-use Psr\Cache\CacheItemPoolInterface;
+use Squanch\Commands\AbstractDelete;
 use Cache\Namespaced\NamespacedCachePool;
 
 
-class Delete extends AbstractDelete implements ICmdDelete
+/**
+ * @method \Cache\Hierarchy\HierarchicalPoolInterface getConnector()
+ */
+class Delete extends AbstractDelete
 {
-	protected function getConnector(): CacheItemPoolInterface
+	protected function onDeleteBucket(string $bucket): bool
 	{
-		return parent::getConnector();
+		$bucket = new NamespacedCachePool($this->getConnector(), $bucket);
+		return $bucket->clear();
 	}
-	
-	
-	public function execute(): bool
+
+	protected function onDeleteItem(string $bucket, string $key): bool
 	{
-		$fields = [];
-		$callbackData = new CallbackData();
-		
-		$fields['Bucket'] = $this->getBucket();
-		$callbackData->setBucket($this->getBucket());
-		
-		$bucket = new NamespacedCachePool($this->getConnector(), $this->getBucket());
-		
-		if ($this->getKey() && !$bucket->hasItem($this->getKey()))
-		{
-			$result = false;
-		}		
-		else if ($this->getKey())
-		{
-			$fields['Id'] = $this->getKey();
-			$callbackData->setKey($this->getKey());
-			
-			$bucket->deleteItem($this->getKey());
-			$result = !$bucket->hasItem($this->getKey());
-		}
-		else
-		{
-			$result = $bucket->clear();
-		}
-		
-		if ($result)
-		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_DELETE, $callbackData);
-		}
-		else
-		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_DELETE, $callbackData);
-		}
-		
-		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_DELETE, $callbackData);
-		
-		$this->reset();
-		
-		return $result;
+		$bucket = new NamespacedCachePool($this->getConnector(), $bucket);
+		return $bucket->deleteItem($key);
 	}
 }

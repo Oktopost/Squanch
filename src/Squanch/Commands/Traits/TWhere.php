@@ -1,5 +1,5 @@
 <?php
-namespace Squanch\Commands\Helpers;
+namespace Squanch\Commands\Traits;
 
 
 use Squanch\Objects\CallbackData;

@@ -11,7 +11,7 @@ use Squanch\Callbacks\CallbacksHandler;
 abstract class AbstractHas implements ICmdHas
 {
 	use \Squanch\Commands\Traits\TResetTTL;
-	use \Squanch\Commands\Helpers\TWhere;
+	use \Squanch\Commands\Traits\TWhere;
 
 	
 	private $connector;
@@ -20,8 +20,14 @@ abstract class AbstractHas implements ICmdHas
 	private $callbacksHandler;
 	
 	
+	protected function getConnector()
+	{
+		return $this->connector;
+	}
+	
+	
 	protected abstract function onCheck(CallbackData $data): bool;
-	protected abstract function onUpdateTTL(CallbackData $data, int $ttl): bool;
+	protected abstract function onUpdateTTL(CallbackData $data, int $ttl);
 	
 	
 	/**

@@ -2,111 +2,48 @@
 namespace Squanch\Plugins\PhpCache\Command;
 
 
-use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
-use Squanch\Objects\CallbackData;
-use Squanch\Base\Command\ICmdSet;
-use Squanch\AbstractCommand\AbstractSet;
-
-use Psr\Cache\CacheItemPoolInterface;
+use Squanch\Commands\AbstractSet;
 use Cache\Namespaced\NamespacedCachePool;
 
-use Objection\Mapper;
 
-
-class Set extends AbstractSet implements ICmdSet
+/**
+ * @method \Cache\Hierarchy\HierarchicalPoolInterface getConnector()
+ */
+class Set extends AbstractSet
 {
-	private function checkExists(): bool
+	private function doSave(Data $data, NamespacedCachePool $bucket): bool
 	{
-		$has = new Has();
-		$has->setup($this->getConnector(), $this->getCallbacksLoader());
+		$item = $bucket->getItem($data->Id)
+			->expiresAt($data->EndDate)
+			->set($data->serialize());
 		
-		return $has->byKey($this->getKey())->byBucket($this->getBucket())->execute();
-	}
-	
-	private function isInsertOrUpdateOnly($exists): bool
-	{
-		return ($exists && $this->isInsertOnly()) || (!$exists && $this->isUpdateOnly());
-	}
-	
-	private function getCallbackData(Data $data): CallbackData
-	{
-		return (new CallbackData())
-			->setKey($this->getKey())
-			->setBucket($this->getBucket())
-			->setData($data);
-	}
-	
-	private function onFailCallback(Data $data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_SET, $this->getCallbackData($data));
-	}
-	
-	private function onCompleteCallback(Data $data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_SET, $this->getCallbackData($data));
-	}
-	
-	private function onSuccessCallback($data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_SET, $this->getCallbackData($data));
+		return $bucket->save($item);
 	}
 	
 	
-	protected function getConnector(): CacheItemPoolInterface
+	protected function onInsert(Data $data): bool
 	{
-		return parent::getConnector();
+		$bucket = new NamespacedCachePool($this->getConnector(), $data->Bucket);
+		
+		if ($bucket->hasItem($data->Id))
+			return false;
+		
+		return $this->doSave($data, $bucket);
 	}
 
-	
-	public function execute(): bool
+	protected function onUpdate(Data $data): bool
 	{
-		$data = new Data();
-		$data->Id = $this->getKey();
-		$data->Bucket = $this->getBucket();
+		$bucket = new NamespacedCachePool($this->getConnector(), $data->Bucket);
 		
-		$data->Value = $this->getJsonData();
+		if (!$bucket->hasItem($data->Id))
+			return false;
 		
-		$data->setTTL($this->getTTL());
-		
-		if ($this->isInsertOnly() || $this->isUpdateOnly())
-		{
-			$exists = $this->checkExists();
-			
-			if ($this->isInsertOrUpdateOnly($exists))
-			{
-				$this->onFailCallback($data);
-				$this->onCompleteCallback($data);
-				$this->reset();
-				
-				return false;
-			}
-		}
-		
-		$bucket = new NamespacedCachePool($this->getConnector(), $this->getBucket());
-		
-		
-		$mapper = Mapper::createFor(Data::class);
-		
-		$item = $bucket->getItem($this->getKey())
-			->expiresAt($data->EndDate)
-			->set($mapper->getJson($data));
-		
-		$result = $bucket->save($item);
-		
-		if ($result)
-		{
-			$this->onSuccessCallback($data);
-		}
-		else
-		{
-			$this->onFailCallback($data);
-		}
-		
-		$this->onCompleteCallback($data);
-		
-		$this->reset();
-		
-		return true;
+		return $this->doSave($data, $bucket);
+	}
+
+	protected function onSave(Data $data): bool
+	{
+		return $this->doSave($data, new NamespacedCachePool($this->getConnector(), $data->Bucket));
 	}
 }

@@ -9,7 +9,7 @@ use Squanch\Callbacks\CallbacksHandler;
 
 abstract class AbstractDelete implements ICmdDelete
 {
-	use \Squanch\Commands\Helpers\TWhere;
+	use \Squanch\Commands\Traits\TWhere;
 	
 	
 	private $connector;

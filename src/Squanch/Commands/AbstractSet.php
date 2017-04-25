@@ -65,6 +65,12 @@ abstract class AbstractSet implements ICmdSet
 	}
 	
 	
+	protected function getConnector()
+	{
+		return $this->connector;
+	}
+	
+	
 	public function __construct()
 	{
 		$this->data = new Data();

@@ -2,12 +2,10 @@
 namespace Squanch\Enum;
 
 
-use Objection\TEnum;
-
-
 class Bucket
 {
-	use TEnum;
+	use \Objection\TEnum;
+	
 	
 	const DEFAULT_BUCKET_NAME = 'default';
 }
