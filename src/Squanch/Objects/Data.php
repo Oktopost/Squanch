@@ -2,21 +2,22 @@
 namespace Squanch\Objects;
 
 
-use Objection\LiteObject;
-use Objection\LiteSetup;
-
 use Squanch\Enum\TTL;
 use Squanch\Enum\Bucket;
 
+use Objection\Mapper;
+use Objection\LiteSetup;
+use Objection\LiteObject;
+
 
 /**
- * @property string $Id
- * @property string $Bucket
- * @property string $Value
- * @property int $TTL
- * @property \DateTime $EndDate
- * @property \DateTime $Created
- * @property \DateTime $Modified
+ * @property string		$Id
+ * @property string		$Bucket
+ * @property string		$Value
+ * @property int		$TTL
+ * @property \DateTime	$EndDate
+ * @property \DateTime	$Created
+ * @property \DateTime	$Modified
  */
 class Data extends LiteObject
 {
@@ -48,10 +49,6 @@ class Data extends LiteObject
 		{
 			$interval = TTL::FOREVER;
 		}
-		else if ($newTTL == 0)
-		{
-			$interval = 0;
-		}
 		else
 		{
 			$interval = $newTTL;
@@ -59,5 +56,20 @@ class Data extends LiteObject
 		
 		$this->TTL = $newTTL;
 		$this->EndDate = (new \DateTime())->modify("+ {$interval} seconds");
+	}
+	
+	
+	public function serialize(): \stdClass
+	{
+		$mapper = Mapper::createFor(Data::class);
+		return $mapper->getStdClass($this);
+	}
+	
+	public static function deserialize(\stdClass $data): Data
+	{
+		$mapper = Mapper::createFor(Data::class);
+		
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $mapper->getObject($data);
 	}
 }

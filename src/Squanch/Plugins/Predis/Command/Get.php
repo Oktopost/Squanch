@@ -74,7 +74,7 @@ class Get extends AbstractGet implements ICmdGet
 	/**
 	 * @return IGetCollection
 	 */
-	public function asCollection($limit = 999)
+	public function asCollection(int $limit = 1000)
 	{
 		$callbackData = (new CallbackData())->setBucket($this->getBucket());
 		

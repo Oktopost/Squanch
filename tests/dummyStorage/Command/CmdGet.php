@@ -60,7 +60,7 @@ class CmdGet extends AbstractGet implements ICmdGet
 	/**
 	 * @return IGetCollection
 	 */
-	public function asCollection($limit = 999)
+	public function asCollection(int $limit = 1000)
 	{
 		$result = false;
 		$callbackData = (new CallbackData())->setBucket($this->getBucket());

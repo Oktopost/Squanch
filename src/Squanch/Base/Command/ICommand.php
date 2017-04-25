@@ -2,7 +2,7 @@
 namespace Squanch\Base\Command;
 
 
-interface ICommand extends ICmdCallback
+interface ICommand
 {
 	public function execute(): bool;
 }

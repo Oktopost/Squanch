@@ -107,7 +107,7 @@ class MigrationGet implements ICmdGet
 	/**
 	 * @return IGetCollection
 	 */
-	public function asCollection($limit = 999)
+	public function asCollection(int $limit = 1000)
 	{
 		return new CollectionHandler([]);
 	}
@@ -147,10 +147,10 @@ class MigrationGet implements ICmdGet
 	/**
 	 * @return LiteObject|bool
 	 */
-	public function asLiteObject(string $liteObjectName)
+	public function asLiteObject(string $class)
 	{
 		$this->executeIfNeed();
-		$result = isset($this->get) ? $this->get->asLiteObject($liteObjectName) : false;
+		$result = isset($this->get) ? $this->get->asLiteObject($class) : false;
 		$this->executed = false;
 		return $result;
 	}
@@ -158,10 +158,10 @@ class MigrationGet implements ICmdGet
 	/**
 	 * @return LiteObject[]|bool
 	 */
-	public function asArrayOfLiteObjects(string $liteObjectName)
+	public function asArrayOfLiteObjects(string $class)
 	{
 		$this->executeIfNeed();
-		$result = isset($this->get) ? $this->get->asArrayOfLiteObjects($liteObjectName) : false;
+		$result = isset($this->get) ? $this->get->asArrayOfLiteObjects($class) : false;
 		$this->executed = false;
 		return $result;
 	}

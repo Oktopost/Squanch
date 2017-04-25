@@ -162,33 +162,33 @@ abstract class AbstractGet implements ICmdGet
 	/**
 	 * @return LiteObject|bool
 	 */
-	public function asLiteObject(string $liteObjectName)
+	public function asLiteObject(string $class)
 	{
 		if (!$this->executeIfNeed())
 			return false;
 		
 		
-		$mapper = Mapper::createFor($liteObjectName);
+		$mapper = Mapper::createFor($class);
 		
-		$result = $mapper->getObject($this->asArray(), $liteObjectName);
+		$result = $mapper->getObject($this->asArray(), $class);
 		
 		$this->afterExecute();
 		
 		return $result;
 	}
 	
-	public function asArrayOfLiteObjects(string $liteObjectName)
+	public function asArrayOfLiteObjects(string $class)
 	{
 		if (!$this->executeIfNeed())
 			return false;
 		
-		$mapper = Mapper::createFor($liteObjectName);
+		$mapper = Mapper::createFor($class);
 		
 		$result = [];
 		
 		foreach ($this->asArray() as $item)
 		{
-			$result[] = $mapper->getObject($item, $liteObjectName);
+			$result[] = $mapper->getObject($item, $class);
 		}
 		
 		$this->afterExecute();

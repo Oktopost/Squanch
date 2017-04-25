@@ -16,8 +16,8 @@ abstract class AbstractSet implements ICmdSet
 {
 	private $connector;
 	private $callbacksLoader;
-	private $insertOnly;
-	private $updateOnly;
+	private $insertOnly = false;
+	private $updateOnly = false;
 	private $key;
 	private $bucket = Bucket::DEFAULT_BUCKET_NAME;
 	private $data;
@@ -212,11 +212,11 @@ abstract class AbstractSet implements ICmdSet
 	
 	public function isInsertOnly()
 	{
-		return $this->insertOnly == true;
+		return $this->insertOnly;
 	}
 	
 	public function isUpdateOnly()
 	{
-		return $this->updateOnly == true;
+		return $this->updateOnly;
 	}
 }

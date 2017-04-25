@@ -14,13 +14,7 @@ class CollectionHandler implements IGetCollection
 	private $data;
 	
 	
-	private function afterExecute()
-	{
-		$this->data = [];
-	}
-	
-	
-	public function __construct(array $data)
+	public function __construct(array $data = [])
 	{
 		$this->data = $data;
 	}
@@ -42,8 +36,7 @@ class CollectionHandler implements IGetCollection
 				$result[] = $item;
 			}
 		}
-
-		$this->afterExecute();
+		
 		return $result;
 	}
 	
@@ -64,7 +57,6 @@ class CollectionHandler implements IGetCollection
 			}
 		}
 		
-		$this->afterExecute();
 		return $result;
 	}
 	
@@ -81,7 +73,6 @@ class CollectionHandler implements IGetCollection
 			$result[] = $mapper->getObject($data->Value, $liteObjectName);
 		}
 		
-		$this->afterExecute();
 		return $result;
 	}
 	
@@ -96,18 +87,6 @@ class CollectionHandler implements IGetCollection
 		{
 			$result[] = $data->Value;
 		}
-		
-		$this->afterExecute();
-		return $result;
-	}
-	
-	/**
-	 * @return Data[]|bool
-	 */
-	public function asArrayOfData()
-	{
-		$result = $this->data;
-		$this->afterExecute();
 		
 		return $result;
 	}

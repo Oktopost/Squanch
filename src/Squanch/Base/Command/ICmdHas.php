@@ -2,6 +2,7 @@
 namespace Squanch\Base\Command;
 
 
-interface ICmdHas extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL
+interface ICmdHas extends ISetupWithConnectorAndCallbacksLoader, IWhere, IResetTTL
 {
+	public function check(): bool;
 }

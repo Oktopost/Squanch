@@ -3,6 +3,7 @@ namespace Squanch\Base\Command;
 
 
 
-interface ICmdDelete extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere
+interface ICmdDelete extends ISetupWithConnectorAndCallbacksLoader, IWhere
 {
+	public function execute(): bool;
 }

@@ -3,11 +3,11 @@ namespace Squanch\Base;
 
 
 use Squanch\Enum\Bucket;
+use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Command\ICmdDelete;
-use Squanch\Base\Boot\ICallbacksLoader;
 
 
 interface ICachePlugin

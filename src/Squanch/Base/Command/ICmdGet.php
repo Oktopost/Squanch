@@ -3,11 +3,10 @@ namespace Squanch\Base\Command;
 
 
 use Squanch\Objects\Data;
-
 use Objection\LiteObject;
 
 
-interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWhere, IResetTTL, ICmdGetCallback
+interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, IWhere, IResetTTL
 {
 	/**
 	 * @return array|bool
@@ -22,12 +21,12 @@ interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWher
 	/**
 	 * @return LiteObject|bool
 	 */
-	public function asLiteObject(string $liteObjectName);
+	public function asLiteObject(string $class);
 	
 	/**
 	 * @return LiteObject[]|bool
 	 */
-	public function asArrayOfLiteObjects(string $liteObjectName);
+	public function asArrayOfLiteObjects(string $class);
 	
 	/**
 	 * @return string|bool
@@ -38,9 +37,4 @@ interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, ICommand, IWher
 	 * @return Data|bool
 	 */
 	public function asData();
-	
-	/**
-	 * @return IGetCollection
-	 */
-	public function asCollection($limit = 999);
 }
