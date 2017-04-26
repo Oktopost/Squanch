@@ -9,9 +9,6 @@ use dummyStorage\Config;
 use Squanch\Objects\Data;
 
 
-require_once __DIR__.'/../../dummyStorage/Config.php';
-
-
 class GetTest extends PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */

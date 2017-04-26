@@ -21,7 +21,7 @@ trait TWhere
 	public function dataObject(): CallbackData
 	{
 		$this->_createDataObjectIfNotExists();
-		return $this->dataObject();
+		return $this->_dataObject;
 	}
 	
 	public function key(): string
@@ -54,6 +54,19 @@ trait TWhere
 	{
 		$this->_createDataObjectIfNotExists();
 		$this->_dataObject->Bucket = $bucket;
+		return $this;
+	}
+
+	/**
+	 * @param string $bucket
+	 * @param string $key
+	 * @return static
+	 */
+	public function byIdentifier(string $bucket, string $key)
+	{
+		$this->_createDataObjectIfNotExists();
+		$this->_dataObject->Bucket = $bucket;
+		$this->_dataObject->Key = $key;
 		return $this;
 	}
 }

@@ -7,9 +7,6 @@ use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
 
 
-require_once __DIR__.'/../../dummyStorage/Config.php';
-
-
 class HasTest extends PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */

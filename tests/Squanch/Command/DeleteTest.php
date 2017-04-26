@@ -7,9 +7,6 @@ use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
 
 
-require_once __DIR__.'/../../dummyStorage/Config.php';
-
-
 class DeleteTest extends PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */
@@ -39,7 +36,7 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	public function test_onDeleteSuccess_return_true()
 	{
 		$result = false;
-		$this->cache->set('a', 'b')->execute();
+		$this->cache->set('a', 'b')->save();
 		
 		$this->cache->delete('a')->onSuccess(function() use(&$result){
 			$result = true;
@@ -78,11 +75,11 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	public function test_remove_from_one_box_leave_other()
 	{
 		$key = uniqid();
-		$this->cache->set($key, 'a', 'b')->execute();
-		$this->cache->set($key, 'c', 'd')->execute();
+		$this->cache->set($key, 'a', 'b')->save();
+		$this->cache->set($key, 'c', 'd')->save();
 		
 		$this->cache->delete($key, 'b')->execute();
-		$exists = $this->cache->has($key, 'd')->execute();
+		$exists = $this->cache->has($key, 'd')->save();
 		
 		self::assertTrue($exists);
 		
@@ -91,13 +88,13 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	
 	public function test_remove_by_bucket()
 	{
-		$this->cache->set('a', 'a', 'a')->execute();
-		$this->cache->set('b', 'a', 'a')->execute();
-		$this->cache->set('c', 'a', 'a')->execute();
+		$this->cache->set('a', 'a', 'a')->save();
+		$this->cache->set('b', 'a', 'a')->save();
+		$this->cache->set('c', 'a', 'a')->save();
 		
-		$this->cache->set('a', 'a', 'b')->execute();
-		$this->cache->set('b', 'a', 'b')->execute();
-		$this->cache->set('c', 'a', 'b')->execute();
+		$this->cache->set('a', 'a', 'b')->save();
+		$this->cache->set('b', 'a', 'b')->save();
+		$this->cache->set('c', 'a', 'b')->save();
 		
 		$delete = $this->cache->delete()->byBucket('a')->execute();
 		

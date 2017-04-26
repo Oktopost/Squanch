@@ -4,7 +4,7 @@ namespace Squanch\Plugins\Squid\Command;
 
 use Squanch\Enum\Callbacks;
 use Squanch\Base\Command\ICmdDelete;
-use Squanch\AbstractCommand\AbstractDelete;
+use Squanch\Commands\AbstractDelete;
 
 use Squanch\Objects\CallbackData;
 use Squanch\Exceptions\SquanchException;

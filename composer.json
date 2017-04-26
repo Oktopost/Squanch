@@ -40,7 +40,7 @@
         }
     },
     "scripts": {
-        //"test": "bash test.sh"
+        "test": "./vendor/bin/phpunit"
     },
     "suggest": {
         "predis/predis": "Use predis for storing cache",

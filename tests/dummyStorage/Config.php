@@ -19,9 +19,6 @@ use Predis\Client;
 use Cache\Adapter\Predis\PredisCachePool;
 
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
-
 class Config
 {
 	/** @var ICachePlugin */
