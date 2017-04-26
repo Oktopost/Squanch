@@ -24,7 +24,7 @@ abstract class AbstractPlugin implements ICachePlugin
 		if ($bucket) $where->byBucket($bucket);
 		if ($key) $where->byKey($key);
 		
-		return $this;
+		return $where;
 	}
 	
 	

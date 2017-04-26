@@ -26,8 +26,8 @@ class Handler implements ICacheEvents
 	public function __construct()
 	{
 		$this->delete	= new CommandEvents\DeleteEventHandler();
-		$this->set		= new CommandEvents\GetEventHandler();
-		$this->get		= new CommandEvents\SetEventHandler();
+		$this->set		= new CommandEvents\SetEventHandler();
+		$this->get		= new CommandEvents\GetEventHandler();
 		$this->has		= new CommandEvents\HasEventHandler();
 	}
 	

@@ -2,6 +2,8 @@
 namespace Squanch\Decorators\Migration;
 
 
+use Squanch\Base\Callbacks\ICacheEvents;
+use Squanch\Base\Callbacks\ICacheEventsConsumer;
 use Squanch\Enum\Bucket;
 use Squanch\Base\ICachePlugin;
 use Squanch\Base\Command\ICmdGet;
@@ -16,9 +18,6 @@ class MigrationDecorator implements ICachePlugin
 	private $main;
 	private $fallback;
 	
-	/** @var ICallbacksLoader */
-	private $callbackLoader;
-	
 	
 	public function __construct(ICachePlugin $main, ICachePlugin $fallback)
 	{
@@ -26,20 +25,6 @@ class MigrationDecorator implements ICachePlugin
 		$this->fallback = $fallback;
 	}
 	
-	
-	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin
-	{
-		$this->main->setCallbacksLoader($callbacksLoader);
-		$this->fallback->setCallbacksLoader($callbacksLoader);
-		$this->callbackLoader = $callbacksLoader;
-		
-		return $this;
-	}
-	
-	public function getCallbacksLoader(): ICallbacksLoader
-	{
-		return $this->callbackLoader;
-	}
 	
 	public function delete(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
@@ -68,5 +53,15 @@ class MigrationDecorator implements ICachePlugin
 	public function set(string $key = null, $data = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
 		return $this->main->set($key, $data, $bucket);
+	}
+
+	public function getEvents(): ICacheEventsConsumer
+	{
+		return null;
+	}
+
+	public function setEventManager(ICacheEvents $events): ICachePlugin
+	{
+		return $this;
 	}
 }

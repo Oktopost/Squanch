@@ -132,6 +132,8 @@ class Config
 		{
 			$instanceName = 'dummy';
 		}
+		
+		$event = new Squanch\Events\Handler();
 
 		/** @var IConfigLoader $configLoader */
 		$configLoader = Squanch::skeleton(IConfigLoader::class);
@@ -142,6 +144,11 @@ class Config
 		$configLoader->addInstance($this->initMigrationInstance());
 		$configLoader->addInstance($this->initRedisInstance());
 		$configLoader->addInstance($this->initPredisInstance());
+		
+		foreach ($configLoader->getInstances() as $instance)
+		{
+			$instance->Plugin->setEventManager($event);
+		}
 		
 		/** @var IBoot $squanch */
 		$squanch = Squanch::skeleton(IBoot::class);

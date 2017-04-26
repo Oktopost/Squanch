@@ -2,12 +2,11 @@
 namespace Squanch;
 
 
-use dummyStorage\Config;
-use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
+use dummyStorage\Config;
 
 
-class MigrationTest extends PHPUnit_Framework_TestCase
+class MigrationTest extends \PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */
 	private $migrationPlugin;
@@ -41,7 +40,7 @@ class MigrationTest extends PHPUnit_Framework_TestCase
 		
 		$key = uniqid();
 		
-		$set = $this->migrationPlugin->set($key, 'a')->execute();
+		$set = $this->migrationPlugin->set($key, 'a')->save();
 		$getHard = $this->squidHardCachePlugin->get($key)->asString();
 		$getSoft = $this->squidSoftCachePlugin->get($key)->asString();
 		
@@ -62,10 +61,9 @@ class MigrationTest extends PHPUnit_Framework_TestCase
 		$key = uniqid();
 		$value = 'blahblahblah';
 		
-		$this->squidSoftCachePlugin->set($key, $value)->execute();
+		$this->squidSoftCachePlugin->set($key, $value)->save();
 		$get = $this->migrationPlugin->get($key);
 		
-		self::assertTrue($get->execute());
 		self::assertEquals($value, $get->asString());
 		
 		$this->squidSoftCachePlugin->delete($key)->execute();

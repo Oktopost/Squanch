@@ -16,17 +16,11 @@ use Squanch\Exceptions\SquanchInstanceException;
  */
 class Boot implements IBoot
 {
-	/**
-	 * @autoload
-	 * @var \Squanch\Base\Boot\ICallbacksLoader $callbacksLoader
-	 */
-	private $callbacksLoader;
-	
 	/** @var IConfigLoader $config */
 	private $config;
 	
 	/** @var Instance[] $filteredInstances */
-	private $filteredInstances;
+	private $filteredInstances = [];
 	
 	
 	private function filterInstances(\Closure $compare)
@@ -49,30 +43,10 @@ class Boot implements IBoot
 		$this->filteredInstances = $instances;
 	}
 	
-	private function getCallbacksLoaderWithCallbacks(): ICallbacksLoader
-	{
-		/** @var ICallbacksLoader $loader */
-		$loader = $this->callbacksLoader;
-		
-		foreach ($this->config->getCallbacks() as $key => $value)
-		{
-			$loader->addCallback($key, $value, true);
-		}
-		
-		return $this->callbacksLoader;
-	}
-	
 	
 	public function resetFilters()
 	{
 		$this->filteredInstances = $this->config->getInstances();
-		$callbacksLoader = $this->getCallbacksLoaderWithCallbacks();
-		
-		foreach ($this->filteredInstances as $instance)
-		{
-			$instance->Plugin->setCallbacksLoader($callbacksLoader);
-		}
-		
 		return $this;
 	}
 	

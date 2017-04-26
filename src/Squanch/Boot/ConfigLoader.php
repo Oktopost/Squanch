@@ -13,7 +13,6 @@ use Squanch\Exceptions\SquanchUnknownCallbackException;
 class ConfigLoader implements IConfigLoader
 {
 	private $instances = [];
-	private $callbacks = [];
 	
 	
 	public function addInstance(Instance $instance, bool $override = false): IConfigLoader
@@ -36,27 +35,5 @@ class ConfigLoader implements IConfigLoader
 	public function getInstances(): array
 	{
 		return array_values($this->instances);
-	}
-	
-	/**
-	 * @param ICallback|\Closure $callback
-	 */
-	public function callback(string $callbackType, $callback): IConfigLoader
-	{
-		if (Callbacks::isExists($callbackType))
-		{
-			$this->callbacks[$callbackType] = $callback;
-		}
-		else
-		{
-			throw new SquanchUnknownCallbackException();
-		}
-		
-		return $this;
-	}
-	
-	public function getCallbacks(): array
-	{
-		return $this->callbacks;
 	}
 }
