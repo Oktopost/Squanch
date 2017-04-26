@@ -2,12 +2,13 @@
 namespace Squanch\Command;
 
 
-use dummyStorage\Config;
-use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
+use Squanch\Exceptions\OperationNotSupportedOnBucketException;
+
+use dummyStorage\Config;
 
 
-class DeleteTest extends PHPUnit_Framework_TestCase
+class DeleteTest extends \PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */
 	private $cache;
@@ -38,9 +39,11 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 		$result = false;
 		$this->cache->set('a', 'b')->save();
 		
-		$this->cache->delete('a')->onSuccess(function() use(&$result){
+		$this->cache->getEvents()->onDelete()->onHit(function() use (&$result){
 			$result = true;
-		})->execute();
+		});
+		
+		$this->cache->delete('a')->execute();
 		
 		self::assertTrue($result);
 	}
@@ -55,31 +58,23 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 	{
 		$result = false;
 		
-		$this->cache->delete('fake')->onFail(function() use(&$result){
+		$this->cache->getEvents()->onDelete()->onMiss(function() use (&$result){
 			$result = true;
-		})->execute();
+		});
+		
+		$this->cache->delete('fake')->execute();
 		
 		self::assertTrue($result);
 	}
 	
-	public function test_onDelete_return_true()
-	{
-		$result = false;
-		$this->cache->delete('a')->onComplete(function() use(&$result){
-			$result = true;
-		})->execute();
-		
-		self::assertTrue($result);
-	}
-	
-	public function test_remove_from_one_box_leave_other()
+	public function test_remove_DeleteFromOneBucket_LeaveInAnotherBucket()
 	{
 		$key = uniqid();
-		$this->cache->set($key, 'a', 'b')->save();
-		$this->cache->set($key, 'c', 'd')->save();
+		$this->cache->set($key, 'a', 'buck_1')->save();
+		$this->cache->set($key, 'c', 'buck_2')->save();
 		
-		$this->cache->delete($key, 'b')->execute();
-		$exists = $this->cache->has($key, 'd')->save();
+		$this->cache->delete($key, 'buck_1')->execute();
+		$exists = $this->cache->has($key, 'buck_2')->check();
 		
 		self::assertTrue($exists);
 		
@@ -95,8 +90,13 @@ class DeleteTest extends PHPUnit_Framework_TestCase
 		$this->cache->set('a', 'a', 'b')->save();
 		$this->cache->set('b', 'a', 'b')->save();
 		$this->cache->set('c', 'a', 'b')->save();
+		$delete = false;
 		
-		$delete = $this->cache->delete()->byBucket('a')->execute();
+		try {
+			$delete = $this->cache->delete()->byBucket('a')->execute();
+		} catch (OperationNotSupportedOnBucketException $e) {
+			return;
+		}
 		
 		$get = [
 			$this->cache->get('a', 'b')->asString(),

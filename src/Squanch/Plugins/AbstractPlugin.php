@@ -45,28 +45,28 @@ abstract class AbstractPlugin implements ICachePlugin
 		return $this;
 	}
 	
-	public function delete(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
+	public function delete(string $key = '', string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
 		$delete = $this->getCmdDelete();
 		$delete->setDeleteEvents($this->event->deleteEvent());
 		return $this->setupWhere($delete, $bucket, $key);
 	}
 	
-	public function get(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
+	public function get(string $key = '', string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
 		$get = $this->getCmdGet();
 		$get->setGetEvents($this->event->getEvent());
 		return $this->setupWhere($get, $bucket, $key);
 	}
 	
-	public function has(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
+	public function has(string $key = '', string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
 	{
 		$has = $this->getCmdHas();
 		$has->setHasEvents($this->event->hasEvent());
 		return $this->setupWhere($has, $bucket, $key);
 	}
 	
-	public function set(string $key = null, $data = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
+	public function set(string $key = '', $data = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
 		$set = $this->getCmdSet();
 		$set->setSetEvents($this->event->setEvent());
