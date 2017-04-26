@@ -24,7 +24,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 	
 	public function test_get_asData_return_data()
 	{
-		$this->cache->set('a', 'b')->execute();
+		$this->cache->set('a', 'b')->save();
 		
 		$get = $this->cache->get()->byKey('a')->asData();
 		
@@ -35,13 +35,13 @@ class GetTest extends PHPUnit_Framework_TestCase
 	public function test_get_by_key_return_false()
 	{
 		$get = $this->cache->get()->byKey('fake');
-		self::assertFalse($get->execute());
+		self::assertFalse($get->asData());
 	}
 	
 	public function test_resetTTL_will_update_ttl()
 	{
 		$key = uniqid();
-		$this->cache->set($key, 'b')->setTTL(10)->execute();
+		$this->cache->set($key, 'b')->setTTL(10)->save();
 		
 		$get = $this->cache->get($key)->asData();
 		self::assertLessThanOrEqual(10, $get->TTL);
@@ -56,7 +56,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 	{
 		$key = uniqid();
 		$data = ['test'];
-		$this->cache->set($key, $data)->execute();
+		$this->cache->set($key, $data)->save();
 		$get = $this->cache->get()->byKey($key)->asArray();
 
 		self::assertTrue(is_array($get));
@@ -67,7 +67,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 	public function test_as_Object_return_object()
 	{
 		$key = uniqid();
-		$this->cache->set($key, (object)['a'=>1])->execute();
+		$this->cache->set($key, (object)['a' => 1])->save();
 		$get = $this->cache->get($key)->asObject();
 		
 		self::assertTrue(is_object($get));
@@ -80,7 +80,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$key = uniqId();
 		$string = 'Lorem ipsum';
 		
-		$this->cache->set($key, $string)->execute();
+		$this->cache->set($key, $string)->save();
 		$result = $this->cache->get($key)->asString();
 		
 		self::assertTrue(is_string($result));
@@ -98,7 +98,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		$obj->Some = 'string';
 		$obj->Nested = $nested;
 		
-		$this->cache->set($key, $obj)->execute();
+		$this->cache->set($key, $obj)->save();
 		
 		$get = $this->cache->get($key)->asLiteObject(myMegaObject::class);
 		
@@ -118,7 +118,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		
 		$array = [$obj, $anotherObj];
 		
-		$this->cache->set($key, $array)->execute();
+		$this->cache->set($key, $array)->save();
 		
 		$get = $this->cache->get($key)->asLiteObjects(myOtherMegaObject::class);
 		
@@ -137,8 +137,8 @@ class GetTest extends PHPUnit_Framework_TestCase
 	public function test_use_two_buckets()
 	{
 		$key = uniqid();
-		$this->cache->set($key, 'a', 'b')->insertOnly()->execute();
-		$this->cache->set($key, 'c', 'd')->insertOnly()->execute();
+		$this->cache->set($key, 'a', 'b')->insert();
+		$this->cache->set($key, 'c', 'd')->insert();
 		
 		$getA = $this->cache->get($key, 'b')->asString();
 		$getB = $this->cache->get($key, 'd')->asString();
@@ -148,18 +148,6 @@ class GetTest extends PHPUnit_Framework_TestCase
 		
 		$this->cache->delete($key, 'b')->execute();
 		$this->cache->delete($key, 'd')->execute();
-	}
-	
-	public function test_get_onComplete_twice()
-	{
-		$result = [false, false];
-		$this->cache->get('a', 'b')->onComplete(function() use(&$result){
-			$result[0] = true;
-		})->onComplete(function() use(&$result) {
-			$result[1] = true;
-		})->execute();
-		
-		self::assertEquals([true, true], $result);
 	}
 }
 

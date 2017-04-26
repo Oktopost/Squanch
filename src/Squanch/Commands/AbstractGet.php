@@ -1,5 +1,4 @@
 <?php
-
 namespace Squanch\Commands;
 
 
@@ -67,7 +66,6 @@ abstract class AbstractGet implements ICmdGet
 	{
 		$this->event = $event;
 	}
-	
 	
 	/**
 	 * @return array|bool

@@ -72,9 +72,9 @@ class Data extends LiteObject
 			'Bucket'   => $this->Bucket,
 			'Value'    => $this->Value,
 			'TTL'      => (string)$this->TTL,
-			'EndDate'  => (string)$this->EndDate->getTimestamp(),
-			'Created'  => (string)$this->Created->getTimestamp(),
-			'Modified' => (string)$this->Modified->getTimestamp()
+			'EndDate'  => $this->EndDate->getTimestamp(),
+			'Created'  => $this->Created->getTimestamp(),
+			'Modified' => $this->Modified->getTimestamp()
 		];
 	}
 
