@@ -158,10 +158,10 @@ class MigrationGet implements ICmdGet
 	/**
 	 * @return LiteObject[]|bool
 	 */
-	public function asArrayOfLiteObjects(string $class)
+	public function asLiteObjects(string $class)
 	{
 		$this->executeIfNeed();
-		$result = isset($this->get) ? $this->get->asArrayOfLiteObjects($class) : false;
+		$result = isset($this->get) ? $this->get->asLiteObjects($class) : false;
 		$this->executed = false;
 		return $result;
 	}

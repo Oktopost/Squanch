@@ -3,11 +3,10 @@
 namespace Squanch\Commands;
 
 
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdGet;
+use Squanch\Base\Callbacks\Events\IGetEvent;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
-use Squanch\Callbacks\CallbacksHandler;
 
 use Objection\Mapper;
 use Objection\LiteObject;
@@ -19,10 +18,8 @@ abstract class AbstractGet implements ICmdGet
 	use \Squanch\Commands\Traits\TResetTTL;
 	
 	
-	private $connector;
-	
-	/** @var CallbacksHandler */
-	private $callbacksHandler;
+	/** @var IGetEvent */
+	private $event;
 
 
 	/**
@@ -36,7 +33,15 @@ abstract class AbstractGet implements ICmdGet
 			throw new \Exception('Key must be set for the get operation!');
 		
 		$result = $this->onGet($data);
-		$this->callbacksHandler->onGetRequest(is_null($result), $data);
+		
+		if (is_null($result))
+		{
+			$this->event->onMiss($data->Bucket, $data->Key);
+		}
+		else
+		{
+			$this->event->onHit($result);
+		}
 		
 		if ($result && $this->hasTTL())
 		{
@@ -45,12 +50,6 @@ abstract class AbstractGet implements ICmdGet
 		}
 		
 		return !is_null($result);
-	}
-	
-	
-	protected function getConnector()
-	{
-		return $this->connector;
 	}
 	
 	
@@ -63,14 +62,10 @@ abstract class AbstractGet implements ICmdGet
 	protected abstract function onUpdateTTL(CallbackData $data, int $newTTL);
 	
 	
-	/**
-	 * @return static
-	 */
-	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	
+	public function setGetEvents(IGetEvent $event)
 	{
-		$this->connector = $connector;
-		$this->callbacksHandler = new CallbacksHandler($callbacksLoader);
-		return $this;
+		$this->event = $event;
 	}
 	
 	
@@ -113,7 +108,7 @@ abstract class AbstractGet implements ICmdGet
 	/**
 	 * @return LiteObject[]|bool
 	 */
-	public function asArrayOfLiteObjects(string $class)
+	public function asLiteObjects(string $class)
 	{
 		if (!$this->tryGet($this->dataObject(), $data))
 			return false;

@@ -2,9 +2,8 @@
 namespace Squanch\Commands;
 
 
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdDelete;
-use Squanch\Callbacks\CallbacksHandler;
+use Squanch\Base\Callbacks\Events\IDeleteEvent;
 
 
 abstract class AbstractDelete implements ICmdDelete
@@ -12,32 +11,19 @@ abstract class AbstractDelete implements ICmdDelete
 	use \Squanch\Commands\Traits\TWhere;
 	
 	
-	private $connector;
-	
-	/** @var CallbacksHandler */
-	private $callbacksHandler;
-	
-	
-	protected function getConnector()
-	{
-		return $this->connector;
-	}
+	/** @var IDeleteEvent */
+	private $event;
 	
 	
 	protected abstract function onDeleteBucket(string $bucket): bool;
 	protected abstract function onDeleteItem(string $bucket, string $key): bool;
 	
 	
-	/**
-	 * @return static
-	 */
-	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	public function setDeleteEvents(IDeleteEvent $event)
 	{
-		$this->connector = $connector;
-		$this->callbacksHandler = new CallbacksHandler($callbacksLoader);
-		return $this;
+		$this->event = $event;
 	}
-	
+
 	public function execute(): bool
 	{
 		if ($this->key())
@@ -49,7 +35,14 @@ abstract class AbstractDelete implements ICmdDelete
 			$result = $this->onDeleteBucket($this->bucket());
 		}
 		
-		$this->callbacksHandler->onDeleteRequest($result, $this->dataObject());
+		if ($result)
+		{
+			$this->event->onHit($this->bucket(), $this->key());
+		}
+		else
+		{
+			$this->event->onMiss($this->bucket(), $this->key());
+		}
 		
 		return $result;
 	}

@@ -5,14 +5,14 @@ namespace Squanch\Plugins\Predis\Command;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractGet;
-use Predis\Client;
+use Squanch\Plugins\Predis\Connector\IPredisConnector;
 
 
-/**
- * @method Client getConnector()
- */
-class Get extends AbstractGet
+class Get extends AbstractGet implements IPredisConnector
 {
+	use \Squanch\Plugins\Predis\Connector\TPredisConnector;
+	
+	
 	private function getFullKey(CallbackData $data)
 	{
 		return "{$data->Bucket}:{$data->Key}";
@@ -21,7 +21,7 @@ class Get extends AbstractGet
 	
 	protected function onUpdateTTL(CallbackData $data, int $newTTL)
 	{
-		$this->getConnector()->expire($this->getFullKey($data), $newTTL);
+		$this->getClient()->expire($this->getFullKey($data), $newTTL);
 	}
 	
 	/**
@@ -30,7 +30,7 @@ class Get extends AbstractGet
 	 */
 	protected function onGet(CallbackData $data)
 	{
-		$item = $this->getConnector()->hgetall($this->getFullKey($data));
+		$item = $this->getClient()->hgetall($this->getFullKey($data));
 		return ($item ? Data::deserialize($item) : null);
 	}
 }

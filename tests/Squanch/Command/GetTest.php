@@ -120,7 +120,7 @@ class GetTest extends PHPUnit_Framework_TestCase
 		
 		$this->cache->set($key, $array)->execute();
 		
-		$get = $this->cache->get($key)->asArrayOfLiteObjects(myOtherMegaObject::class);
+		$get = $this->cache->get($key)->asLiteObjects(myOtherMegaObject::class);
 		
 		foreach ($get as $key => $value)
 		{

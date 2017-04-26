@@ -3,15 +3,15 @@ namespace Squanch\Plugins\Predis\Command;
 
 
 use Squanch\Objects\Data;
+use Squanch\Plugins\Predis\Connector\IPredisConnector;
 use Squanch\Commands\AbstractSet;
-use Predis\Client;
 
 
-/**
- * @method Client getConnector()
- */
-class Set extends AbstractSet
+class Set extends AbstractSet implements IPredisConnector
 {
+	use \Squanch\Plugins\Predis\Connector\TPredisConnector;
+	
+	
 	private function getFullKey(Data $data)
 	{
 		return "{$data->Bucket}:{$data->Id}";
@@ -25,7 +25,7 @@ class Set extends AbstractSet
 	 */
 	private function saveOnCondition(Data $data, $isExists): bool
 	{
-		$connector = $this->getConnector();
+		$connector = $this->getClient();
 		$key = $this->getFullKey($data);
 		
 		if (!is_null($isExists) && $isExists != $connector->exists($key))

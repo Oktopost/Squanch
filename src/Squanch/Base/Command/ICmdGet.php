@@ -2,11 +2,13 @@
 namespace Squanch\Base\Command;
 
 
+use Squanch\Base\Callbacks\Events\IGetEvent;
+use Squanch\Base\Callbacks\Provider\IGetEventProvider;
 use Squanch\Objects\Data;
 use Objection\LiteObject;
 
 
-interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, IWhere, IResetTTL
+interface ICmdGet extends IWhere, IResetTTL, IGetEventProvider
 {
 	/**
 	 * @return array|bool
@@ -26,7 +28,7 @@ interface ICmdGet extends ISetupWithConnectorAndCallbacksLoader, IWhere, IResetT
 	/**
 	 * @return LiteObject[]|bool
 	 */
-	public function asArrayOfLiteObjects(string $class);
+	public function asLiteObjects(string $class);
 	
 	/**
 	 * @return string|bool

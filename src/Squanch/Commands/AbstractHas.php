@@ -2,10 +2,9 @@
 namespace Squanch\Commands;
 
 
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdHas;
+use Squanch\Base\Callbacks\Events\IHasEvent;
 use Squanch\Objects\CallbackData;
-use Squanch\Callbacks\CallbacksHandler;
 
 
 abstract class AbstractHas implements ICmdHas
@@ -14,32 +13,19 @@ abstract class AbstractHas implements ICmdHas
 	use \Squanch\Commands\Traits\TWhere;
 
 	
-	private $connector;
-	
-	/** @var CallbacksHandler */
-	private $callbacksHandler;
-	
-	
-	protected function getConnector()
-	{
-		return $this->connector;
-	}
+	/** @var IHasEvent */
+	private $event;
 	
 	
 	protected abstract function onCheck(CallbackData $data): bool;
 	protected abstract function onUpdateTTL(CallbackData $data, int $ttl);
 	
 	
-	/**
-	 * @return static
-	 */
-	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	public function setHasEvents(IHasEvent $event)
 	{
-		$this->connector = $connector;
-		$this->callbacksHandler = new CallbacksHandler($callbacksLoader);
-		return $this;
+		$this->event = $event;
 	}
-	
+
 
 	public function check(): bool
 	{
@@ -53,7 +39,14 @@ abstract class AbstractHas implements ICmdHas
 			$this->onUpdateTTL($this->dataObject(), $this->getTTL());
 		}
 		
-		$this->callbacksHandler->onHasRequest($result, $this->dataObject());
+		if ($result)
+		{
+			$this->event->onHit($this->bucket(), $this->key());
+		}
+		else
+		{
+			$this->event->onMiss($this->bucket(), $this->key());
+		}
 		
 		return $result;
 	}

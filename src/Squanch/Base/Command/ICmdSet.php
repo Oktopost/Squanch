@@ -2,7 +2,10 @@
 namespace Squanch\Base\Command;
 
 
-interface ICmdSet extends ISetupWithConnectorAndCallbacksLoader
+use Squanch\Base\Callbacks\Provider\ISetEventProvider;
+
+
+interface ICmdSet extends ISetEventProvider
 {
 	/**
 	 * @return static
@@ -30,17 +33,17 @@ interface ICmdSet extends ISetupWithConnectorAndCallbacksLoader
 	public function setForever();
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function insert();
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function update();
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function save();
 }

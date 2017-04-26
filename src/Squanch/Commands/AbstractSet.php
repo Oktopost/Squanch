@@ -2,11 +2,9 @@
 namespace Squanch\Commands;
 
 
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\Command\ICmdSet;
-use Squanch\Objects\CallbackData;
+use Squanch\Base\Callbacks\Events\ISetEvent;
 use Squanch\Objects\Data;
-use Squanch\Callbacks\CallbacksHandler;
 
 use Objection\Mapper;
 use Objection\LiteObject;
@@ -15,10 +13,9 @@ use Objection\LiteObject;
 abstract class AbstractSet implements ICmdSet
 {
 	private $data;
-	private $connector;
 	
-	/** @var CallbacksHandler */
-	private $callbacksHandler;
+	/** @var ISetEvent */
+	private $event;
 	
 	
 	private function getJsonData($data): string
@@ -56,37 +53,17 @@ abstract class AbstractSet implements ICmdSet
 			return json_encode($data);
 		}
 	}
-	
-	private function processResult(bool $result): bool
-	{
-		$this->callbacksHandler->onSetRequest($result, 
-			new CallbackData($this->data->Bucket, $this->data->Id));
-		return $result;
-	}
-	
-	
-	protected function getConnector()
-	{
-		return $this->connector;
-	}
-	
-	
+
 	public function __construct()
 	{
 		$this->data = new Data();
 	}
-
-
-	/**
-	 * @return static
-	 */
-	public function setup($connector, ICallbacksLoader $callbacksLoader)
+	
+	
+	public function setSetEvents(ISetEvent $event)
 	{
-		$this->connector = $connector;
-		$this->callbacksHandler = new CallbacksHandler($callbacksLoader);
-		return $this;
+		$this->event = $event;
 	}
-
 
 	/**
 	 * @return static
@@ -140,26 +117,44 @@ abstract class AbstractSet implements ICmdSet
 	
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function insert()
 	{
-		return $this->processResult($this->onInsert($this->data));
+		if ($this->onInsert($this->data))
+		{
+			$this->event->onInsert($this->data);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function update()
 	{
-		return $this->processResult($this->onUpdate($this->data));
+		if ($this->onUpdate($this->data))
+		{
+			$this->event->onUpdate($this->data);
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
-	 * @return static
+	 * @return bool
 	 */
 	public function save()
 	{
-		return $this->processResult($this->onSave($this->data));
+		if ($this->onSave($this->data))
+		{
+			$this->event->onSave($this->data);
+			return true;
+		}
+		
+		return false;
 	}
 }

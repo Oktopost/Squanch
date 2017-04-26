@@ -2,7 +2,10 @@
 namespace Squanch\Base\Command;
 
 
-interface ICmdHas extends ISetupWithConnectorAndCallbacksLoader, IWhere, IResetTTL
+use Squanch\Base\Callbacks\Provider\IHasEventProvider;
+
+
+interface ICmdHas extends IHasEventProvider, IWhere, IResetTTL
 {
 	public function check(): bool;
 }

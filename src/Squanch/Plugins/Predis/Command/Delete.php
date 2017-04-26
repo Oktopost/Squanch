@@ -3,14 +3,16 @@ namespace Squanch\Plugins\Predis\Command;
 
 
 use Squanch\Commands\AbstractDelete;
+use Squanch\Plugins\Predis\Connector\IPredisConnector;
+
 use Predis\Client;
 
 
-/**
- * @method Client getConnector()
- */
-class Delete extends AbstractDelete
+class Delete extends AbstractDelete implements IPredisConnector
 {
+	use \Squanch\Plugins\Predis\Connector\TPredisConnector;
+	
+	
 	protected function onDeleteBucket(string $bucket): bool
 	{
 		throw new \Exception('Deleting a bucket is not supported!');
@@ -18,6 +20,6 @@ class Delete extends AbstractDelete
 
 	protected function onDeleteItem(string $bucket, string $key): bool
 	{
-		return ($this->getConnector()->del(["$bucket:$key"]) > 0);
+		return ($this->getClient()->del(["$bucket:$key"]) > 0);
 	}
 }

@@ -4,14 +4,14 @@ namespace Squanch\Plugins\Predis\Command;
 
 use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractHas;
-use Predis\Client;
+use Squanch\Plugins\Predis\Connector\IPredisConnector;
 
 
-/**
- * @method Client getConnector()
- */
-class Has extends AbstractHas
+class Has extends AbstractHas implements IPredisConnector
 {
+	use \Squanch\Plugins\Predis\Connector\TPredisConnector;
+	
+	
 	private function getFullKey(CallbackData $data)
 	{
 		return "{$data->Bucket}:{$data->Key}";
@@ -20,11 +20,11 @@ class Has extends AbstractHas
 	
 	protected function onUpdateTTL(CallbackData $data, int $newTTL)
 	{
-		$this->getConnector()->expire($this->getFullKey($data), $newTTL);
+		$this->getClient()->expire($this->getFullKey($data), $newTTL);
 	}
 	
 	protected function onCheck(CallbackData $data): bool
 	{
-		return ($this->getConnector()->exists($this->getFullKey($data)) > 0);
+		return ($this->getClient()->exists($this->getFullKey($data)) > 0);
 	}
 }
