@@ -4,93 +4,82 @@ namespace Squanch\Plugins;
 
 use Squanch\Enum\Bucket;
 use Squanch\Base\ICachePlugin;
+use Squanch\Base\Command\IWhere;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;
 use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Command\ICmdDelete;
-use Squanch\Base\Boot\ICallbacksLoader;
+use Squanch\Base\Callbacks\ICacheEvents;
+use Squanch\Base\Callbacks\ICacheEventsConsumer;
 
 
 abstract class AbstractPlugin implements ICachePlugin
 {
-	/** @var ICallbacksLoader */
-	private $callbacksLoader;
+	/** @var ICacheEvents */
+	private $event;
 	
 	
-	protected abstract function getConnector();
-	
-	protected abstract function getCmdGet(): ICmdGet;
-	
-	protected abstract function getCmdHas(): ICmdHas;
-	
-	protected abstract function getCmdDelete(): ICmdDelete;
-	
-	protected abstract function getCmdSet(): ICmdSet;
-	
-	
-	public function setCallbacksLoader(ICallbacksLoader $callbacksLoader): ICachePlugin
+	private function setupWhere(IWhere $where, string $bucket, string $key)
 	{
-		$this->callbacksLoader = $callbacksLoader;
+		if ($bucket) $where->byBucket($bucket);
+		if ($key) $where->byKey($key);
+		
 		return $this;
 	}
 	
-	public function getCallbacksLoader(): ICallbacksLoader
+	
+	protected abstract function getCmdGet(): ICmdGet;
+	protected abstract function getCmdHas(): ICmdHas;
+	protected abstract function getCmdDelete(): ICmdDelete;
+	protected abstract function getCmdSet(): ICmdSet;
+	
+	
+	public function getEvents(): ICacheEventsConsumer
 	{
-		return $this->callbacksLoader;
+		return $this->event;
+	}
+
+	public function setEventManager(ICacheEvents $events): ICachePlugin
+	{
+		$this->event = $events;
+		return $this;
 	}
 	
-	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
+	public function delete(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
-		$result= $this->getCmdDelete()->setup($this->getConnector(), $this->callbacksLoader);
-		
-		if ($key)
-			$result->byKey($key);
-		
-		if ($bucketName)
-			$result->byBucket($bucketName);
-		
-		return $result;
+		$delete = $this->getCmdDelete();
+		$delete->setDeleteEvents($this->event->deleteEvent());
+		return $this->setupWhere($delete, $bucket, $key);
 	}
 	
-	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
+	public function get(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
-		$result = $this->getCmdGet()->setup($this->getConnector(), $this->callbacksLoader);
-		
-		if ($key)
-			$result->byKey($key);
-		
-		if ($bucketName)
-			$result->byBucket($bucketName);
-		
-		return $result;
+		$get = $this->getCmdGet();
+		$get->setGetEvents($this->event->getEvent());
+		return $this->setupWhere($get, $bucket, $key);
 	}
 	
-	public function has(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
+	public function has(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
 	{
-		$result = $this->getCmdHas()->setup($this->getConnector(), $this->callbacksLoader);
-		
-		if ($key)
-			$result->byKey($key);
-		
-		if ($bucketName)
-			$result->byBucket($bucketName);
-		
-		return $result;
+		$has = $this->getCmdHas();
+		$has->setHasEvents($this->event->hasEvent());
+		return $this->setupWhere($has, $bucket, $key);
 	}
 	
-	public function set(string $key = null, $data = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
+	public function set(string $key = null, $data = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
-		$result = $this->getCmdSet()->setup($this->getConnector(), $this->callbacksLoader);
+		$set = $this->getCmdSet();
+		$set->setSetEvents($this->event->setEvent());
 		
 		if ($key)
-			$result->setKey($key);
+			$set->setKey($key);
 		
 		if ($data)
-			$result->setData($data);
+			$set->setData($data);
 		
-		if ($bucketName)
-			$result->setBucket($bucketName);
+		if ($bucket)
+			$set->setBucket($bucket);
 		
-		return $result;
+		return $set;
 	}
 }

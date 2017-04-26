@@ -41,12 +41,12 @@ class MigrationDecorator implements ICachePlugin
 		return $this->callbackLoader;
 	}
 	
-	public function delete(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
+	public function delete(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdDelete
 	{
-		return $this->main->delete($key, $bucketName);
+		return $this->main->delete($key, $bucket);
 	}
 	
-	public function get(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
+	public function get(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdGet
 	{
 		$get = new MigrationGet($this->main, $this->fallback);
 		$get->setup(null, $this->callbackLoader);
@@ -54,19 +54,19 @@ class MigrationDecorator implements ICachePlugin
 		if ($key)
 			$get->byKey($key);
 		
-		if($bucketName)
-			$get->byBucket($bucketName);
+		if($bucket)
+			$get->byBucket($bucket);
 		
 		return $get;
 	}
 	
-	public function has(string $key = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
+	public function has(string $key = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdHas
 	{
-		return $this->main->has($key, $bucketName);
+		return $this->main->has($key, $bucket);
 	}
 	
-	public function set(string $key = null, $data = null, string $bucketName = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
+	public function set(string $key = null, $data = null, string $bucket = Bucket::DEFAULT_BUCKET_NAME): ICmdSet
 	{
-		return $this->main->set($key, $data, $bucketName);
+		return $this->main->set($key, $data, $bucket);
 	}
 }

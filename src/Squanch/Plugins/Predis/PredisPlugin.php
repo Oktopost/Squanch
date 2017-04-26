@@ -2,6 +2,8 @@
 namespace Squanch\Plugins\Predis;
 
 
+use Squanch\Base\Callbacks\ICacheEvents;
+use Squanch\Base\Callbacks\ICacheEventsConsumer;
 use Squanch\Base\ICachePlugin;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;
@@ -18,34 +20,39 @@ class PredisPlugin extends AbstractPlugin implements ICachePlugin
 	private $connector;
 	
 	
-	protected function getConnector()
-	{
-		return $this->connector;
-	}
-	
 	protected function getCmdGet(): ICmdGet
 	{
-		return new Command\Get();
+		return (new Command\Get())->setClient($this->connector);
 	}
 	
 	protected function getCmdHas(): ICmdHas
 	{
-		return new Command\Has();
+		return (new Command\Has())->setClient($this->connector);
 	}
 	
 	protected function getCmdDelete(): ICmdDelete
 	{
-		return new Command\Delete();
+		return (new Command\Delete())->setClient($this->connector);
 	}
 	
 	protected function getCmdSet(): ICmdSet
 	{
-		return new Command\Set();
+		return (new Command\Set())->setClient($this->connector);
 	}
-
 	
-	public function __construct(Client $client)
+	
+	/**
+	 * @param Client|array $client Predis client or predis config.
+	 */
+	public function __construct($client)
 	{
-		$this->connector = $client;
+		if (is_array($client))
+		{
+			$this->connector = new Client($client);
+		}
+		else
+		{
+			$this->connector = $client;
+		}
 	}
 }
