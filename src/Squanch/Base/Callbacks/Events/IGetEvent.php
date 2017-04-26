@@ -8,5 +8,5 @@ use Squanch\Objects\Data;
 
 interface IGetEvent extends IMissEvent
 {
-	public function onHit(Data $data);
+	public function triggerHit(Data $data);
 }

@@ -36,11 +36,11 @@ abstract class AbstractGet implements ICmdGet
 		
 		if (is_null($result))
 		{
-			$this->event->onMiss($data->Bucket, $data->Key);
+			$this->event->triggerMiss($data->Bucket, $data->Key);
 		}
 		else
 		{
-			$this->event->onHit($result);
+			$this->event->triggerHit($result);
 		}
 		
 		if ($result && $this->hasTTL())

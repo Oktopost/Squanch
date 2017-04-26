@@ -123,7 +123,7 @@ abstract class AbstractSet implements ICmdSet
 	{
 		if ($this->onInsert($this->data))
 		{
-			$this->event->onInsert($this->data);
+			$this->event->triggerInsert($this->data);
 			return true;
 		}
 		
@@ -137,7 +137,7 @@ abstract class AbstractSet implements ICmdSet
 	{
 		if ($this->onUpdate($this->data))
 		{
-			$this->event->onUpdate($this->data);
+			$this->event->triggerUpdate($this->data);
 			return true;
 		}
 		
@@ -151,7 +151,7 @@ abstract class AbstractSet implements ICmdSet
 	{
 		if ($this->onSave($this->data))
 		{
-			$this->event->onSave($this->data);
+			$this->event->triggerSave($this->data);
 			return true;
 		}
 		

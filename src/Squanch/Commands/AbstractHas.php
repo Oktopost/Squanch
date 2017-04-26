@@ -41,11 +41,11 @@ abstract class AbstractHas implements ICmdHas
 		
 		if ($result)
 		{
-			$this->event->onHit($this->bucket(), $this->key());
+			$this->event->triggerHit($this->bucket(), $this->key());
 		}
 		else
 		{
-			$this->event->onMiss($this->bucket(), $this->key());
+			$this->event->triggerMiss($this->bucket(), $this->key());
 		}
 		
 		return $result;

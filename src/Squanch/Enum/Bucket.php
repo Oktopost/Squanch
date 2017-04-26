@@ -4,7 +4,7 @@ namespace Squanch\Enum;
 
 class Bucket
 {
-	use \Objection\TEnum;
+	use \Objection\TConstsClass;
 	
 	
 	const DEFAULT_BUCKET_NAME = 'default';
