@@ -6,17 +6,17 @@ use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractHas;
 
 use Squanch\Plugins\Squid\Utils\UpdateTTL;
-use Squanch\Plugins\Squid\Connector\ISquidConnector;
+use Squanch\Plugins\Squid\Connector\ISquidCacheConnector;
 
 
-class Has extends AbstractHas implements ISquidConnector
+class Has extends AbstractHas implements ISquidCacheConnector
 {
-	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
+	use \Squanch\Plugins\Squid\Connector\TSquidCacheConnector;
 	
 
 	protected function onCheck(CallbackData $data): bool
 	{
-		return $this->getConnector()->getConnector()
+		return $this->getMysqlConnector()
 			->select()
 			->from($this->getTableName())
 			->byField('Bucket', $data->Bucket)

@@ -6,13 +6,13 @@ use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractGet;
 
-use Squanch\Plugins\Squid\Connector\ISquidConnector;
+use Squanch\Plugins\Squid\Connector\ISquidCacheConnector;
 use Squanch\Plugins\Squid\Utils\UpdateTTL;
 
 
-class Get extends AbstractGet implements ISquidConnector
+class Get extends AbstractGet implements ISquidCacheConnector
 {
-	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
+	use \Squanch\Plugins\Squid\Connector\TSquidCacheConnector;
 	
 	
 	/**

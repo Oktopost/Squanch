@@ -5,17 +5,17 @@ namespace Squanch\Plugins\Squid\Command;
 use Squanch\Objects\Data;
 use Squanch\Commands\AbstractSet;
 
-use Squanch\Plugins\Squid\Connector\ISquidConnector;
+use Squanch\Plugins\Squid\Connector\ISquidCacheConnector;
 
 
-class Set extends AbstractSet implements ISquidConnector
+class Set extends AbstractSet implements ISquidCacheConnector
 {
-	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
+	use \Squanch\Plugins\Squid\Connector\TSquidCacheConnector;
 	
 
 	protected function onInsert(Data $data): bool
 	{
-		return (bool)$this->getConnector()->getConnector()
+		return (bool)$this->getMysqlConnector()
 			->insert()
 			->ignore()
 			->into('HardCache')

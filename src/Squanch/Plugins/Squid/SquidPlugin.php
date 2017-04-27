@@ -24,22 +24,22 @@ class SquidPlugin extends AbstractPlugin implements ICachePlugin
 	
 	protected function getCmdGet(): ICmdGet
 	{
-		return (new Command\Get())->setConnector($this->connector, $this->table);
+		return (new Command\Get())->setConnector($this->connector)->setTableName($this->table);
 	}
 	
 	protected function getCmdHas(): ICmdHas
 	{
-		return (new Command\Has())->setConnector($this->connector, $this->table);
-	}
-	
-	protected function getCmdDelete(): ICmdDelete
-	{
-		return (new Command\Delete())->setConnector($this->connector, $this->table);
+		return (new Command\Has())->setConnector($this->connector)->setTableName($this->table);
 	}
 	
 	protected function getCmdSet(): ICmdSet
 	{
-		return (new Command\Set())->setConnector($this->connector, $this->table);
+		return (new Command\Set())->setConnector($this->connector)->setTableName($this->table);
+	}
+	
+	protected function getCmdDelete(): ICmdDelete
+	{
+		return (new Command\Delete())->setConnector($this->connector)->setTableName($this->table);
 	}
 	
 	
