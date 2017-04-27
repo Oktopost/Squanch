@@ -3,16 +3,14 @@ namespace dummyStorage;
 
 
 use Squanch;
+use Squanch\Enum\InstanceType;
+use Squanch\Enum\InstancePriority;
+use Squanch\Base\ICachePlugin;
 use Squanch\Base\Boot\IBoot;
 use Squanch\Base\Boot\IConfigLoader;
-use Squanch\Base\ICachePlugin;
-use Squanch\Enum\InstancePriority;
-use Squanch\Enum\InstanceType;
-use Squanch\Objects\Data;
 use Squanch\Objects\Instance;
-use Squanch\Plugins\PhpCache\PhpCachePlugin;
-use Squanch\Plugins\Squid\SquanchSquidConnector;
 use Squanch\Plugins\Squid\SquidPlugin;
+use Squanch\Plugins\PhpCache\PhpCachePlugin;
 
 use Squid\MySql;
 use Predis\Client;
@@ -49,7 +47,6 @@ class Config
 	private function initMigrationInstance()
 	{
 		$instanceA = $this->initSquidInstance('HardCache');
-//		$instanceB = $this->initSquidInstance('SoftCache', 'squid_soft');
 		$instanceB = $this->initPredisInstance();
 		
 		$plugin = new Squanch\Decorators\Migration\MigrationDecorator($instanceA->Plugin, $instanceB->Plugin);
@@ -94,16 +91,7 @@ class Config
 			]);
 		
 		
-		$connector = new SquanchSquidConnector();
-		
-		$connector
-			->setConnector($mysql->getConnector())
-			->setDomain(Data::class)
-			->setTable($tableName)
-			->setIgnoreFields(['Created', 'Modified']);
-		
-		
-		$plugin = new SquidPlugin($connector);
+		$plugin = new SquidPlugin($mysql->getConnector('main'), $tableName);
 		
 		$instance = new Instance();
 		$instance->Name = $instanceName;

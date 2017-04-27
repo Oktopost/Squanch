@@ -2,61 +2,29 @@
 namespace Squanch\Plugins\Squid\Command;
 
 
-use Squanch\Enum\Callbacks;
-use Squanch\Base\Command\ICmdDelete;
 use Squanch\Commands\AbstractDelete;
-
-use Squanch\Objects\CallbackData;
-use Squanch\Exceptions\SquanchException;
-
-use Squid\MySql\Connectors\IMySqlObjectConnector;
+use Squanch\Plugins\Squid\Connector\ISquidConnector;
 
 
-class Delete extends AbstractDelete implements ICmdDelete
+class Delete extends AbstractDelete implements ISquidConnector
 {
-	protected function getConnector(): IMySqlObjectConnector
+	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
+	
+
+	protected function onDeleteBucket(string $bucket): bool
 	{
-		return parent::getConnector();
+		return (bool)$this->getConnector()->getConnector()->delete()
+			->from($this->getTableName())
+			->byField('Bucket', $bucket)
+			->executeDml(true);
 	}
-	
-	
-	public function execute(): bool
+
+	protected function onDeleteItem(string $bucket, string $key): bool
 	{
-		$fields = [];
-		$callbackData = new CallbackData();
-		
-		if ($this->getKey())
-		{
-			$fields['Id'] = $this->getKey();
-			$callbackData->setKey($this->getKey());
-		}
-		
-		if ($this->getBucket())
-		{
-			$fields['Bucket'] = $this->getBucket();
-			$callbackData->setBucket($this->getBucket());
-		}
-		
-		if (!$fields)
-		{
-			throw new SquanchException('Fields not set');
-		}
-		
-		$result = $this->getConnector()->deleteByFields($fields);
-		
-		if ($result)
-		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_DELETE, $callbackData);
-		}
-		else
-		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_DELETE, $callbackData);
-		}
-		
-		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_DELETE, $callbackData);
-		
-		$this->reset();
-		
-		return $result;
+		return (bool)$this->getConnector()->getConnector()->delete()
+			->from($this->getTableName())
+			->byField('Bucket',	$bucket)
+			->byField('Id',		$key)
+			->executeDml(true);
 	}
 }

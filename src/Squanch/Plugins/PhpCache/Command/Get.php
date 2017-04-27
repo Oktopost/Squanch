@@ -15,10 +15,10 @@ use Cache\Namespaced\NamespacedCachePool;
  */
 class Get extends AbstractGet
 {
-	protected function onUpdateTTL(CallbackData $data, int $newTTL)
+	protected function onUpdateTTL(CallbackData $data, int $ttl)
 	{
 		$bucket = new NamespacedCachePool($this->getConnector(), $data->Bucket);
-		$bucket->getItem($data->Key)->expiresAfter($newTTL);
+		$bucket->getItem($data->Key)->expiresAfter($ttl);
 	}
 	
 	/**

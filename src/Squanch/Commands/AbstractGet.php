@@ -58,7 +58,7 @@ abstract class AbstractGet implements ICmdGet
 	 */
 	protected abstract function onGet(CallbackData $data);
 	
-	protected abstract function onUpdateTTL(CallbackData $data, int $newTTL);
+	protected abstract function onUpdateTTL(CallbackData $data, int $ttl);
 	
 	
 	

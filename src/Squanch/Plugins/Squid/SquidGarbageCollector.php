@@ -2,31 +2,36 @@
 namespace Squanch\Plugins\Squid;
 
 
-use Squanch\Plugins\Squid\Base\ISquanchSquidConnector;
+use Squid\MySql\IMySqlConnector;
 
 
 class SquidGarbageCollector
 {
+	/** @var IMySqlConnector */
 	private $connector;
+	private $tableName;
 	
 	private $date;
-	private $maxIterations     = 999;
-	private $limitPerIteration = 100;
+	private $sleepMS			= 10;
+	private $limitPerIteration	= 100;
+	private $maxIterations    	= 999;
 	
 	
 	private function delete(): int
 	{
-		return $this->connector->cmdDelete()
+		return $this->connector
+			->delete()
 			->limitBy($this->limitPerIteration)
-			->where('EndDate < ?', $this->date)
+			->where('EndDate < ?', strtotime($this->date))
 			->executeDml(true);
 	}
 
 	
-	public function __construct(ISquanchSquidConnector $connector)
+	public function __construct(IMySqlConnector $connector, $tableName)
 	{
 		$this->connector = $connector;
-		$this->date = new \DateTime();
+		$this->tableName = $tableName;
+		$this->date = time();
 	}
 	
 	
@@ -42,11 +47,18 @@ class SquidGarbageCollector
 		return $this;
 	}
 	
-	public function setEndDate(\DateTime $date)
+	public function setEndDate(int $date)
 	{
 		$this->date = $date;
 		return $this;
 	}
+	
+	public function setWaitTime(int $ms)
+	{
+		$this->sleepMS = $ms;
+		return $this;
+	}
+	
 	
 	public function run(): int
 	{
@@ -60,7 +72,7 @@ class SquidGarbageCollector
 				break;
 			
 			$totalDeleted += $deleted;
-			time_nanosleep(0, 100000000);
+			usleep($this->sleepMS * 1000);
 		}
 		
 		return $totalDeleted;

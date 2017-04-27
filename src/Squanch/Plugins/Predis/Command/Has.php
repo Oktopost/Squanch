@@ -4,6 +4,7 @@ namespace Squanch\Plugins\Predis\Command;
 
 use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractHas;
+use Squanch\Plugins\Predis\Utils\UpdateTTL;
 use Squanch\Plugins\Predis\Connector\IPredisConnector;
 
 
@@ -18,9 +19,10 @@ class Has extends AbstractHas implements IPredisConnector
 	}
 	
 	
-	protected function onUpdateTTL(CallbackData $data, int $newTTL)
+	protected function onUpdateTTL(CallbackData $data, int $ttl)
 	{
-		$this->getClient()->expire($this->getFullKey($data), $newTTL);
+		$updater = new UpdateTTL($this->getClient());
+		$updater->updateTTL($data, $ttl);
 	}
 	
 	protected function onCheck(CallbackData $data): bool

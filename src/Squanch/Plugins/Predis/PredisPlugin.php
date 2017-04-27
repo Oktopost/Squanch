@@ -2,8 +2,6 @@
 namespace Squanch\Plugins\Predis;
 
 
-use Squanch\Base\Callbacks\ICacheEvents;
-use Squanch\Base\Callbacks\ICacheEventsConsumer;
 use Squanch\Base\ICachePlugin;
 use Squanch\Base\Command\ICmdGet;
 use Squanch\Base\Command\ICmdHas;

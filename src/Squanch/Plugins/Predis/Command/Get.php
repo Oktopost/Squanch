@@ -5,6 +5,8 @@ namespace Squanch\Plugins\Predis\Command;
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
 use Squanch\Commands\AbstractGet;
+
+use Squanch\Plugins\Predis\Utils\UpdateTTL;
 use Squanch\Plugins\Predis\Connector\IPredisConnector;
 
 
@@ -19,9 +21,10 @@ class Get extends AbstractGet implements IPredisConnector
 	}
 	
 	
-	protected function onUpdateTTL(CallbackData $data, int $newTTL)
+	protected function onUpdateTTL(CallbackData $data, int $ttl)
 	{
-		$this->getClient()->expire($this->getFullKey($data), $newTTL);
+		$updater = new UpdateTTL($this->getClient());
+		$updater->updateTTL($data, $ttl);
 	}
 	
 	/**

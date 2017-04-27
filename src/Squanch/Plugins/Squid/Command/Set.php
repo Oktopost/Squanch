@@ -2,99 +2,34 @@
 namespace Squanch\Plugins\Squid\Command;
 
 
-use Squanch\Enum\Callbacks;
 use Squanch\Objects\Data;
-use Squanch\Objects\CallbackData;
-use Squanch\Base\Command\ICmdSet;
-use Squanch\AbstractCommand\AbstractSet;
+use Squanch\Commands\AbstractSet;
 
-use Squid\MySql\Connectors\IMySqlObjectConnector;
+use Squanch\Plugins\Squid\Connector\ISquidConnector;
 
 
-class Set extends AbstractSet implements ICmdSet
+class Set extends AbstractSet implements ISquidConnector
 {
-	private function checkExists(): bool
-	{
-		$has = new Has();
-		$has->setup($this->getConnector(), $this->getCallbacksLoader());
-		
-		return $has->byKey($this->getKey())->byBucket($this->getBucket())->execute();
-	}
+	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
 	
-	private function isInsertOrUpdateOnly($exists): bool
+
+	protected function onInsert(Data $data): bool
 	{
-		return ($exists && $this->isInsertOnly()) || (!$exists && $this->isUpdateOnly());
-	}
-	
-	private function getCallbackData(Data $data): CallbackData
-	{
-		return (new CallbackData())
-			->setKey($this->getKey())
-			->setBucket($this->getBucket())
-			->setData($data);
-	}
-	
-	private function onFailCallback(Data $data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_SET, $this->getCallbackData($data));
-	}
-	
-	private function onCompleteCallback(Data $data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_SET, $this->getCallbackData($data));
-	}
-	
-	private function onSuccessCallback($data)
-	{
-		$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_SET, $this->getCallbackData($data));
-	}
-	
-	
-	protected function getConnector(): IMySqlObjectConnector
-	{
-		return parent::getConnector();
+		return (bool)$this->getConnector()->getConnector()
+			->insert()
+			->ignore()
+			->into('HardCache')
+			->values($data->toArray())
+			->executeDml(true);
 	}
 
-	
-	public function execute(): bool
+	protected function onUpdate(Data $data): bool
 	{
-		$data = new Data();
-		$data->Id = $this->getKey();
-		$data->Bucket = $this->getBucket();
-		
-		$data->Value = $this->getJsonData();
-		
-		$data->setTTL($this->getTTL());
-		
-		if ($this->isInsertOnly() || $this->isUpdateOnly())
-		{
-			$exists = $this->checkExists();
-			
-			if ($this->isInsertOrUpdateOnly($exists))
-			{
-				$this->onFailCallback($data);
-				$this->onCompleteCallback($data);
-				$this->reset();
-				
-				return false;
-			}
-		}
-		
-		$result = $this->getConnector()->upsertByFields($data, ['Id', 'Bucket']);
-		
-		if ($result)
-		{
-			$this->onSuccessCallback($data);
-		}
-		else
-		{
-			$this->onFailCallback($data);
-		}
-		
-		$this->onCompleteCallback($data);
-		
-		$this->reset();
-		
-		return true;
+		return $this->getConnector()->updateObjectByFields($data, ['Id', 'Bucket']);
+	}
+
+	protected function onSave(Data $data): bool
+	{
+		return $this->getConnector()->upsertByFields($data, ['Id', 'Bucket']);
 	}
 }

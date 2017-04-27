@@ -2,76 +2,31 @@
 namespace Squanch\Plugins\Squid\Command;
 
 
-use Squanch\Enum\Callbacks;
-use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
-use Squanch\Base\Command\ICmdHas;
-use Squanch\AbstractCommand\AbstractHas;
+use Squanch\Commands\AbstractHas;
 
-use Squid\MySql\Connectors\IMySqlObjectConnector;
+use Squanch\Plugins\Squid\Utils\UpdateTTL;
+use Squanch\Plugins\Squid\Connector\ISquidConnector;
 
 
-class Has extends AbstractHas implements ICmdHas
+class Has extends AbstractHas implements ISquidConnector
 {
-	private $newTTL;
+	use \Squanch\Plugins\Squid\Connector\TSquidConnector;
 	
-	private function updateTTLIfNeed()
+
+	protected function onCheck(CallbackData $data): bool
 	{
-		if ($this->newTTL)
-		{
-			$get = new Get();
-			$get->setup($this->getConnector(), $this->getCallbacksLoader());
-			
-			/** @var Data $object */
-			$object = $get->byKey($this->getKey())->byBucket($this->getBucket())->asData();
-			$object->setTTL($this->newTTL);
-			$this->getConnector()->upsertByFields($object, ['Id', 'Bucket']);
-			
-			unset($this->newTTL);
-		}
+		return $this->getConnector()->getConnector()
+			->select()
+			->from($this->getTableName())
+			->byField('Bucket', $data->Bucket)
+			->byField('Id', $data->Key)
+			->queryExists();
 	}
-	
-	
-	protected function getConnector(): IMySqlObjectConnector
+
+	protected function onUpdateTTL(CallbackData $data, int $ttl)
 	{
-		return parent::getConnector();
-	}
-	
-	
-	public function execute(): bool
-	{
-		$callbackData = (new CallbackData())->setKey($this->getKey())->setBucket($this->getBucket());
-		
-		/** @var Data $result */
-		$result = $this->getConnector()->loadOneByFields(['Id' => $this->getKey(), 'Bucket' => $this->getBucket()]);
-		
-		if ($result)
-		{
-			$result = $result->EndDate > new \DateTime();
-		}
-		
-		if ($result)
-		{
-			$this->updateTTLIfNeed();
-			$this->getCallbacksLoader()->executeCallback(Callbacks::SUCCESS_ON_HAS, $callbackData);
-			$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
-		}
-		else
-		{
-			$this->getCallbacksLoader()->executeCallback(Callbacks::FAIL_ON_HAS, $callbackData);
-		}
-		
-		$this->getCallbacksLoader()->executeCallback(Callbacks::ON_HAS, $callbackData);
-		
-		return $result;
-	}
-	
-	/**
-	 * @return static
-	 */
-	public function resetTTL(int $ttl)
-	{
-		$this->newTTL = $ttl;
-		return $this;
+		$updater = new UpdateTTL($this->getConnector());
+		$updater->updateTTL($data, $ttl);
 	}
 }
