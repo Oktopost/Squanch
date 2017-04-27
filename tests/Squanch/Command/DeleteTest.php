@@ -90,11 +90,13 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 		$this->cache->set('a', 'a', 'b')->save();
 		$this->cache->set('b', 'a', 'b')->save();
 		$this->cache->set('c', 'a', 'b')->save();
-		$delete = false;
 		
-		try {
+		try 
+		{
 			$delete = $this->cache->delete()->byBucket('a')->execute();
-		} catch (OperationNotSupportedOnBucketException $e) {
+		}
+		catch (OperationNotSupportedOnBucketException $e)
+		{
 			return;
 		}
 		
@@ -105,7 +107,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 		];
 		
 		// result could be bool instead of int in case of using nosql storage
-		self::assertEquals(3||true, $delete);
+		self::assertEquals(3 || true, $delete);
 		self::assertEquals(['a','a','a'], $get);
 		
 		$deleteSecond = $this->cache->delete()->byBucket('b')->execute();

@@ -3,15 +3,16 @@ namespace Squanch\Plugins\PhpCache\Command;
 
 
 use Squanch\Objects\CallbackData;
+use Squanch\Plugins\PhpCache\Connector\IPhpCacheConnector;
 use Squanch\Commands\AbstractHas;
 use Cache\Namespaced\NamespacedCachePool;
 
 
-/**
- * @method \Cache\Hierarchy\HierarchicalPoolInterface getConnector()
- */
-class Has extends AbstractHas
+class Has extends AbstractHas implements IPhpCacheConnector
 {
+	use \Squanch\Plugins\PhpCache\Connector\TPhpCacheConnector;
+	
+	
 	protected function onCheck(CallbackData $data): bool
 	{
 		$bucket = new NamespacedCachePool($this->getConnector(), $data->Bucket);

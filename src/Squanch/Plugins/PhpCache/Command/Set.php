@@ -3,15 +3,16 @@ namespace Squanch\Plugins\PhpCache\Command;
 
 
 use Squanch\Objects\Data;
+use Squanch\Plugins\PhpCache\Connector\IPhpCacheConnector;
 use Squanch\Commands\AbstractSet;
 use Cache\Namespaced\NamespacedCachePool;
 
 
-/**
- * @method \Cache\Hierarchy\HierarchicalPoolInterface getConnector()
- */
-class Set extends AbstractSet
+class Set extends AbstractSet implements IPhpCacheConnector
 {
+	use \Squanch\Plugins\PhpCache\Connector\TPhpCacheConnector;
+	
+	
 	private function doSave(Data $data, NamespacedCachePool $bucket): bool
 	{
 		$item = $bucket->getItem($data->Id)

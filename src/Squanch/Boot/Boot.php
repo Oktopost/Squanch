@@ -2,7 +2,6 @@
 namespace Squanch\Boot;
 
 
-use Squanch\Base\Boot\ICallbacksLoader;
 use Squanch\Base\ICachePlugin;
 use Squanch\Base\Boot\IBoot;
 use Squanch\Base\Boot\IConfigLoader;

@@ -4,17 +4,18 @@ namespace Squanch\Plugins\PhpCache\Command;
 
 use Squanch\Objects\Data;
 use Squanch\Objects\CallbackData;
+use Squanch\Plugins\PhpCache\Connector\IPhpCacheConnector;
 use Squanch\Commands\AbstractGet;
 
 use Objection\Mapper;
 use Cache\Namespaced\NamespacedCachePool;
 
 
-/**
- * @method \Cache\Hierarchy\HierarchicalPoolInterface getConnector()
- */
-class Get extends AbstractGet
+class Get extends AbstractGet implements IPhpCacheConnector
 {
+	use \Squanch\Plugins\PhpCache\Connector\TPhpCacheConnector;
+	
+	
 	protected function onUpdateTTL(CallbackData $data, int $ttl)
 	{
 		$bucket = new NamespacedCachePool($this->getConnector(), $data->Bucket);

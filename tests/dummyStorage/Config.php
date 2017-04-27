@@ -44,21 +44,6 @@ class Config
 		return $instance;
 	}
 	
-	private function initMigrationInstance()
-	{
-		$instanceA = $this->initSquidInstance('HardCache');
-		$instanceB = $this->initPredisInstance();
-		
-		$plugin = new Squanch\Decorators\Migration\MigrationDecorator($instanceA->Plugin, $instanceB->Plugin);
-		
-		$instance = new Instance();
-		$instance->Name = 'migration';
-		$instance->Type = InstanceType::HARD;
-		$instance->Plugin = $plugin;
-		
-		return $instance;
-	}
-	
 	private function initPredisInstance()
 	{
 		$instance = new Client(array(
@@ -129,7 +114,6 @@ class Config
 		$configLoader->addInstance($this->initDummyInstance());
 		$configLoader->addInstance($this->initSquidInstance('HardCache'));
 		$configLoader->addInstance($this->initSquidInstance('SoftCache', 'squidSoft'));
-		$configLoader->addInstance($this->initMigrationInstance());
 		$configLoader->addInstance($this->initRedisInstance());
 		$configLoader->addInstance($this->initPredisInstance());
 		
@@ -146,7 +130,6 @@ class Config
 			'dummy' => $squanch->resetFilters()->filterInstancesByName('dummy')->getPlugin(),
 			'squid' => $squanch->resetFilters()->filterInstancesByName('squid')->getPlugin(),
 			'squidSoft' => $squanch->resetFilters()->filterInstancesByName('squidSoft')->getPlugin(),
-			'migration' => $squanch->resetFilters()->filterInstancesByName('migration')->getPlugin(),
 		    'redis' => $squanch->resetFilters()->filterInstancesByName('redis')->getPlugin(),
 		    'predis' => $squanch->resetFilters()->filterInstancesByName('predis')->getPlugin()
 		];
