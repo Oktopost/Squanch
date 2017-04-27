@@ -25,76 +25,15 @@ class SetTest extends PHPUnit_Framework_TestCase
 	
 	public function test_set_return_true()
 	{
-		$set = $this->cache->set('a', 'b')->execute();
+		$set = $this->cache->set('a', 'b')->save();
 		self::assertTrue($set);
-		$this->cache->delete('a')->execute();
-	}
-	
-	public function test_onSetSuccess_return_true()
-	{
-		$key = uniqid();
-		$result = false;
-		$this->cache->set($key, 'b')->onSuccess(function() use(&$result){
-			$result = true;
-		})->execute();
-		
-		self::assertTrue($result);
-		$this->cache->delete($key)->execute();
-	}
-	
-	public function test_onSetSuccess_on_update_return_true()
-	{
-		$result = false;
-		$this->cache->set('a', 'b')->execute();
-		$this->cache->set('a', 'c')->onSuccess(function() use(&$result){
-			$result = true;
-		})->execute();
-		
-		self::assertTrue($result);
-		$this->cache->delete('a')->execute();
-	}
-	
-	public function test_onSetSuccess_callback_contains_data()
-	{
-		$this->cache->set('a', 'b')->onSuccess(function($callbackData){
-			self::assertInstanceOf(CallbackData::class, $callbackData);
-			self::assertEquals('a', $callbackData->Key);
-			self::assertInstanceOf(Data::class, $callbackData->Data);
-			self::assertEquals('b', $callbackData->Data->Value);
-		})->execute();
-		
-		$this->cache->delete('a')->execute();
-	}
-	
-	public function test_onSetFail_return_true()
-	{
-		$result = false;
-		
-		$this->cache->set('a', 'b')->execute();
-		
-		$this->cache->set('a', 'b')->insertOnly()->onFail(function() use(&$result){
-			$result = true;
-		})->execute();
-		
-		self::assertTrue($result);
-		$this->cache->delete('a')->execute();
-	}
-	
-	public function test_onSet_return_true()
-	{
-		$result = false;
-		$this->cache->set('a', 'b')->onComplete(function() use(&$result){
-			$result = true;
-		})->execute();
-		
-		self::assertTrue($result);
 		$this->cache->delete('a')->execute();
 	}
 	
 	public function test_insertOnly_failed_to_update()
 	{
-		$this->cache->set('a', 'b')->execute();
-		$result = $this->cache->set('a', 'c')->insertOnly()->execute();
+		$this->cache->set('a', 'b')->save();
+		$result = $this->cache->set('a', 'c')->insert();
 		
 		self::assertFalse($result);
 		$this->cache->delete('a')->execute();
@@ -103,7 +42,7 @@ class SetTest extends PHPUnit_Framework_TestCase
 	public function test_updateOnly_failed_to_insert()
 	{
 		$key = uniqid();
-		$result = $this->cache->set($key, 'b')->updateOnly()->execute();
+		$result = $this->cache->set($key, 'b')->update();
 		self::assertFalse($result);
 		$this->cache->delete($key)->execute();
 	}
@@ -111,26 +50,25 @@ class SetTest extends PHPUnit_Framework_TestCase
 	public function test_setForever_return_true()
 	{
 		$key = uniqId();
-		$this->cache->set($key, 'data')->setForever()->execute();
+		$this->cache->set($key, 'data')->setForever()->save();
 		
 		$result = $this->cache->get($key)->asData();
 		$interval = TTL::FOREVER;
-		$t = $result->Created->modify("+ {$interval} seconds");
 		
 		self::assertLessThan(0, $result->TTL);
-		self::assertGreaterThanOrEqual($t, $result->EndDate);
+		self::assertGreaterThanOrEqual(TTL::END_OF_TIME, $result->EndDate);
 		
 		$this->cache->delete($key)->execute();
 	}
 	
 	public function test_setTTL_return_true()
 	{
-		$interval = 10;
+		$interval = 1000;
 		$key = uniqid();
-		$this->cache->set($key, 'data')->setTTL($interval)->execute();
+		$this->cache->set($key, 'data')->setTTL($interval)->save();
 		
 		$result = $this->cache->get($key)->asData();
-		$t = (new \DateTime())->modify("+ {$interval} seconds")->getTimestamp();
+		$t = (new \DateTime())->modify("+ $interval seconds")->getTimestamp();
 		
 		self::assertEquals($interval, $result->TTL);
 		self::assertEquals($t, $result->EndDate->getTimestamp());
@@ -140,23 +78,11 @@ class SetTest extends PHPUnit_Framework_TestCase
 	public function test_use_two_buckets()
 	{
 		$key = uniqid();
-		$success = [
-			false, false
-		];
 		
-		$setA = $this->cache->set($key, 'a', 'a')->insertOnly()->onSuccess(function() use (&$success){
-			$success[0] = true;
-		})->execute();
+		self::assertTrue($this->cache->set($key, 'a', 'a')->insert());
+		self::assertTrue($this->cache->set($key, 'a', 'b')->insert());
 		
-		$setB = $this->cache->set($key, 'a', 'b')->insertOnly()->onSuccess(function() use (&$success){
-			$success[1] = true;
-		})->execute();
-		
-		self::assertTrue($setA);
-		self::assertTrue($setB);
-		self::assertEquals([true, true], $success);
-		
-		$this->cache->delete($key, 'a')->execute();
-		$this->cache->delete($key, 'b')->execute();
+		self::assertTrue($this->cache->has($key, 'a')->check());
+		self::assertTrue($this->cache->has($key, 'b')->check());
 	}
 }

@@ -6,8 +6,6 @@ use Squanch\Commands\AbstractDelete;
 use Squanch\Exceptions\OperationNotSupportedOnBucketException;
 use Squanch\Plugins\Predis\Connector\IPredisConnector;
 
-use Predis\Client;
-
 
 class Delete extends AbstractDelete implements IPredisConnector
 {

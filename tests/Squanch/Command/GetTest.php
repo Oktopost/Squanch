@@ -1,15 +1,15 @@
 <?php
 namespace Squanch\Command;
 
-use Objection\LiteObject;
-use Objection\LiteSetup;
-use PHPUnit_Framework_TestCase;
+
 use Squanch\Base\ICachePlugin;
-use dummyStorage\Config;
 use Squanch\Objects\Data;
+use Objection\LiteSetup;
+use Objection\LiteObject;
+use dummyStorage\Config;
 
 
-class GetTest extends PHPUnit_Framework_TestCase
+class GetTest extends \PHPUnit_Framework_TestCase
 {
 	/** @var ICachePlugin */
 	private $cache;

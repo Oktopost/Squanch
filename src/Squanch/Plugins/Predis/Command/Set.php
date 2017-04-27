@@ -32,7 +32,15 @@ class Set extends AbstractSet implements IPredisConnector
 			return false;
 		
 		$connector->hmset($key, $data->serializeToArray());
-		$connector->expire($key, $data->TTL);
+		
+		if ($data->TTL < 0)
+		{
+			$connector->persist($key);
+		}
+		else
+		{
+			$connector->expire($key, $data->TTL);
+		}
 		
 		return true;
 	}

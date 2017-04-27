@@ -30,8 +30,15 @@ class Get extends AbstractGet implements IPredisConnector
 	 */
 	protected function onGet(CallbackData $data)
 	{
-		$item = $this->getClient()->hgetall($this->getFullKey($data));
-		var_dump($item); die;
-		return ($item ? Data::deserialize($item) : null);
+		$key = $this->getFullKey($data);
+		
+		$item = $this->getClient()->hgetall($key);
+		
+		if (!$item)
+			return null;
+			
+		$item['TTL'] = $this->getClient()->ttl($key);
+		
+		return Data::deserialize($item);
 	}
 }

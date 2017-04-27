@@ -84,7 +84,7 @@ abstract class AbstractGet implements ICmdGet
 	 */
 	public function asObject()
 	{
-		if ($this->tryGet($this->dataObject(), $data))
+		if (!$this->tryGet($this->dataObject(), $data))
 			return false;
 		
 		$data = json_decode($data->Value, false);
@@ -112,7 +112,7 @@ abstract class AbstractGet implements ICmdGet
 			return false;
 		
 		$mapper = Mapper::createFor($class);
-		return $mapper->getObjects($data->Value, $class);
+		return $mapper->getObjects(json_decode($data->Value), $class);
 	}
 
 	/**

@@ -2,9 +2,9 @@
 namespace Squanch\Base\Command;
 
 
-use Squanch\Base\Callbacks\Events\IGetEvent;
 use Squanch\Base\Callbacks\Provider\IGetEventProvider;
 use Squanch\Objects\Data;
+
 use Objection\LiteObject;
 
 

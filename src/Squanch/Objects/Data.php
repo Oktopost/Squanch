@@ -45,17 +45,16 @@ class Data extends LiteObject
 			$newTTL = TTL::DEFAULT_TTL;
 		}
 		
+		$this->TTL = $newTTL;
+		
 		if ($newTTL < 0)
 		{
-			$interval = TTL::FOREVER;
+			$this->EndDate = new \DateTime(TTL::END_OF_TIME);
 		}
 		else
 		{
-			$interval = $newTTL;
+			$this->EndDate = (new \DateTime())->modify("+ {$newTTL} seconds");
 		}
-		
-		$this->TTL = $newTTL;
-		$this->EndDate = (new \DateTime())->modify("+ {$interval} seconds");
 	}
 	
 	
@@ -67,14 +66,16 @@ class Data extends LiteObject
 	
 	public function serializeToArray(): array 
 	{
+		$this->setTTL($this->TTL);
+		
 		return [
 			'Id'       => $this->Id,
 			'Bucket'   => $this->Bucket,
 			'Value'    => $this->Value,
 			'TTL'      => (string)$this->TTL,
-			'EndDate'  => $this->EndDate->getTimestamp(),
-			'Created'  => $this->Created->getTimestamp(),
-			'Modified' => $this->Modified->getTimestamp()
+			'EndDate'  => $this->EndDate->format('Y-m-d H:i:s'),
+			'Created'  => $this->Created->format('Y-m-d H:i:s'),
+			'Modified' => $this->Modified->format('Y-m-d H:i:s')
 		];
 	}
 

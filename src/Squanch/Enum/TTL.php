@@ -18,4 +18,7 @@ class TTL
 	
 	const FOREVER      = self::ONE_YEAR * 100;
 	const DEFAULT_TTL  = self::ONE_HOUR;
+	
+	
+	const END_OF_TIME	= '3999-12-31 23:59:59';
 }
