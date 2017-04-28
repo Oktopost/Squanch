@@ -8,16 +8,18 @@ use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Command\ICmdDelete;
 
 use Squanch\Plugins\AbstractPlugin;
+use Squanch\Plugins\InMemoryCache\Base\IStorage;
 
 
 class InMemoryPlugin extends AbstractPlugin
 {
+	/** @var IStorage */
 	private $storage;
 	
 	
 	public function __construct()
 	{
-		$this->storage = new \stdClass();
+		// TODO: $this->storage = new Storage();
 	}
 
 
