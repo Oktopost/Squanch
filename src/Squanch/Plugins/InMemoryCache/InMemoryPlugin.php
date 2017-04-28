@@ -9,6 +9,10 @@ use Squanch\Base\Command\ICmdDelete;
 
 use Squanch\Plugins\AbstractPlugin;
 use Squanch\Plugins\InMemoryCache\Base\IStorage;
+use Squanch\Plugins\InMemoryCache\Command\Delete;
+use Squanch\Plugins\InMemoryCache\Command\Get;
+use Squanch\Plugins\InMemoryCache\Command\Has;
+use Squanch\Plugins\InMemoryCache\Command\Set;
 
 
 class InMemoryPlugin extends AbstractPlugin
@@ -19,27 +23,27 @@ class InMemoryPlugin extends AbstractPlugin
 	
 	public function __construct()
 	{
-		// TODO: $this->storage = new Storage();
+		$this->storage = new Storage();
 	}
 
 
 	protected function getCmdGet(): ICmdGet
 	{
-		// TODO: Implement getCmdGet() method.
+		return new Get($this->storage);
 	}
 
 	protected function getCmdHas(): ICmdHas
 	{
-		// TODO: Implement getCmdHas() method.
+		return new Has($this->storage);
 	}
 
 	protected function getCmdDelete(): ICmdDelete
 	{
-		// TODO: Implement getCmdDelete() method.
+		return new Delete($this->storage);
 	}
 
 	protected function getCmdSet(): ICmdSet
 	{
-		// TODO: Implement getCmdSet() method.
+		return new Set($this->storage);
 	}
 }
