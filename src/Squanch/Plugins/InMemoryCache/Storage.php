@@ -94,8 +94,9 @@ class Storage implements IStorage
 		return null;
 	}
 
-	public function setItem(Data $item)
+	public function setItem(Data $item): bool 
 	{
 		$this->storage[$item->Bucket][$item->Id] = $item;
+		return true;
 	}
 }

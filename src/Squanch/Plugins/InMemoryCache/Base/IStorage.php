@@ -28,5 +28,5 @@ interface IStorage
 	 */
 	public function getItemIfExists(string $bucket, string $key);
 	
-	public function setItem(Data $item); 
+	public function setItem(Data $item): bool; 
 }

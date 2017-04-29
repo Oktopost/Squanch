@@ -22,10 +22,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 	{
 		$storage = new Storage();
 		
-		$data = new Data();
-		$data->Bucket = 'a';
-		$data->Id = 'a';
-		$storage->setItem($data);
+		$this->createItem('a', 'a', $storage);
 		
 		$delete = new Delete($storage);
 		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
@@ -37,10 +34,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 	{
 		$storage = new Storage();
 		
-		$data = new Data();
-		$data->Bucket = 'a';
-		$data->Id = 'a';
-		$storage->setItem($data);
+		$this->createItem('a', 'a', $storage);
 		
 		$delete = new Delete($storage);
 		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
@@ -53,20 +47,99 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 	{
 		$storage = new Storage();
 		
-		$data = new Data();
-		$data->Bucket = 'a';
-		$data->Id = 'a';
-		$storage->setItem($data);
+		$this->createItem('a', 'a', $storage);
 		
-		$data = new Data();
-		$data->Bucket = 'b';
-		$data->Id = 'b';
-		$storage->setItem($data);
+		$this->createItem('b', 'b', $storage);
 		
 		$delete = new Delete($storage);
 		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
 		$delete->byBucket('a')->execute();
 		
 		self::assertTrue($storage->hasBucket('b'));
+	}
+	
+	public function test_onDeleteItem_BucketNotFound_ReturnFalse()
+	{
+		$storage = new Storage();
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		
+		self::assertFalse($delete->byBucket('a')->byKey('a')->execute());
+	}
+	
+	public function test_onDeleteItem_ItemNotFound_ReturnFalse()
+	{
+		$storage = new Storage();
+		
+		$this->createItem('a', 'b', $storage);
+		
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		
+		self::assertFalse($delete->byBucket('a')->byKey('a')->execute());
+	}
+	
+	public function test_onDeleteItem_ItemFound_ReturnTrue()
+	{
+		$storage = new Storage();
+		
+		$this->createItem('a', 'a', $storage);
+		
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		
+		self::assertTrue($delete->byBucket('a')->byKey('a')->execute());
+	}
+	
+	public function test_onDeleteItem_ItemFound_ItemRemoved()
+	{
+		$storage = new Storage();
+		
+		$this->createItem('a', 'a', $storage);
+		
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		$delete->byBucket('a')->byKey('a')->execute();
+		
+		self::assertFalse($storage->hasKey('a', 'a'));
+	}
+	
+	public function test_onDeleteItem_DifferentItemExists_DifferentItemNotRemoved()
+	{
+		$storage = new Storage();
+		
+		$this->createItem('a', 'a', $storage);
+		$this->createItem('a', 'b', $storage);
+		
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		$delete->byBucket('a')->byKey('a')->execute();
+		
+		self::assertTrue($storage->hasKey('a', 'b'));
+	}
+	
+	public function test_onDeleteItem_DifferentBucketExists_DifferentItemNotRemoved()
+	{
+		$storage = new Storage();
+		
+		$this->createItem('a', 'a', $storage);
+		$this->createItem('b', 'a', $storage);
+		
+		$delete = new Delete($storage);
+		$delete->setDeleteEvents($this->createMock(IDeleteEvent::class));
+		$delete->byBucket('a')->byKey('a')->execute();
+		
+		self::assertTrue($storage->hasKey('b', 'a'));
+	}
+	
+	
+	private function createItem(string $bucket, string $key, Storage $storage)
+	{
+		$data = new Data();
+		$data->Bucket = $bucket;
+		$data->Id = $key;
+		$storage->setItem($data);
+		
+		return $storage;
 	}
 }
