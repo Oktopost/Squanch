@@ -23,6 +23,7 @@ class InMemoryPlugin extends AbstractPlugin
 	
 	public function __construct()
 	{
+		parent::__construct();
 		$this->storage = new Storage();
 	}
 

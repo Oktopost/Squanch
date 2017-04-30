@@ -45,6 +45,8 @@ class SquidPlugin extends AbstractPlugin implements ICachePlugin
 	
 	public function __construct(IMySqlConnector $connection, string $table)
 	{
+		parent::__construct();
+		
 		$this->table = $table;
 		$this->connector = new MySqlObjectConnector();
 		$this->connector

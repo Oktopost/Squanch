@@ -11,6 +11,7 @@ use Squanch\Base\Command\ICmdSet;
 use Squanch\Base\Command\ICmdDelete;
 use Squanch\Base\Callbacks\ICacheEvents;
 use Squanch\Base\Callbacks\ICacheEventsConsumer;
+use Squanch\Events\Handler;
 
 
 abstract class AbstractPlugin implements ICachePlugin
@@ -34,6 +35,12 @@ abstract class AbstractPlugin implements ICachePlugin
 	protected abstract function getCmdSet(): ICmdSet;
 	
 	
+	public function __construct()
+	{
+		$this->event = new Handler();
+	}
+
+
 	public function getEvents(): ICacheEventsConsumer
 	{
 		return $this->event;

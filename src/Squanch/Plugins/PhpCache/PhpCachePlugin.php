@@ -41,6 +41,7 @@ class PhpCachePlugin extends AbstractPlugin implements ICachePlugin
 	
 	public function __construct(HierarchicalPoolInterface $connector)
 	{
+		parent::__construct();
 		$this->connector = $connector;
 	}
 }

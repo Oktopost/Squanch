@@ -44,6 +44,8 @@ class PredisPlugin extends AbstractPlugin implements ICachePlugin
 	 */
 	public function __construct($client)
 	{
+		parent::__construct();
+		
 		if (is_array($client))
 		{
 			$this->connector = new Client($client);

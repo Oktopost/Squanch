@@ -3,8 +3,6 @@
         <testsuite name="SquanchSanity">
             <directory>tests</directory>
         </testsuite>
-    </testsuites>
-    <testsuites>
         <testsuite name="Squanch">
             <directory>unitests</directory>
         </testsuite>
