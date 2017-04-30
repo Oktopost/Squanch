@@ -68,68 +68,70 @@ abstract class AbstractGet implements ICmdGet
 	}
 	
 	/**
-	 * @return array|bool
+	 * @return array|null
 	 */
 	public function asArray()
 	{
 		if (!$this->tryGet($this->dataObject(), $data))
-			return false;
+			return null;
 		
 		$data = json_decode($data->Value, true);
-		return is_array($data) ? $data : false;
+		// TODO: Throw exception if not array
+		return is_array($data) ? $data : null;
 	}
 
 	/**
-	 * @return \stdClass|bool
+	 * @return \stdClass|null
 	 */
 	public function asObject()
 	{
 		if (!$this->tryGet($this->dataObject(), $data))
-			return false;
+			return null;
 		
 		$data = json_decode($data->Value, false);
-		return is_object($data) ? $data : false;
+		// TODO: Throw exception if not object
+		return is_object($data) ? $data : null;
 	}
 
 	/**
-	 * @return LiteObject|bool
+	 * @return LiteObject|null
 	 */
 	public function asLiteObject(string $class)
 	{
 		if (!$this->tryGet($this->dataObject(), $data))
-			return false;
+			return null;
 		
 		$mapper = Mapper::createFor($class);
 		return $mapper->getObject($data->Value, $class);
 	}
 
 	/**
-	 * @return LiteObject[]|bool
+	 * @return LiteObject[]|null
 	 */
 	public function asLiteObjects(string $class)
 	{
 		if (!$this->tryGet($this->dataObject(), $data))
-			return false;
+			return null;
 		
 		$mapper = Mapper::createFor($class);
 		return $mapper->getObjects(json_decode($data->Value), $class);
 	}
 
 	/**
-	 * @return string|bool
+	 * @return string|null
 	 */
 	public function asString()
 	{
 		return ($this->tryGet($this->dataObject(), $data) ? 
 			$data->Value :
-			false);
+			null);
 	}
 
 	/**
-	 * @return Data|bool
+	 * @return Data|null
 	 */
 	public function asData()
 	{
-		return ($this->tryGet($this->dataObject(), $data) ? $data : false);
+		return ($this->tryGet($this->dataObject(), $data) ? $data : null);
 	}
 }

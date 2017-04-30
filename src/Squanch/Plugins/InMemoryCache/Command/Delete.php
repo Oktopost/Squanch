@@ -3,15 +3,16 @@ namespace Squanch\Plugins\InMemoryCache\Command;
 
 
 use Squanch\Commands\AbstractDelete;
+use Squanch\Plugins\InMemoryCache\Base\IStorage;
 
 
 class Delete extends AbstractDelete
 {
-	/** @var \stdClass */
+	/** @var IStorage */
 	private $storage;
 	
 	
-	public function __construct(\stdClass $storage)
+	public function __construct(IStorage $storage)
 	{
 		$this->storage = $storage;
 	}
@@ -19,20 +20,11 @@ class Delete extends AbstractDelete
 
 	protected function onDeleteBucket(string $bucket): bool
 	{
-		if (!isset($this->storage->$bucket))
-			return false;
-		
-		unset($this->storage->$bucket);
-		return true;
+		return $this->storage->removeBucket($bucket);
 	}
 
 	protected function onDeleteItem(string $bucket, string $key): bool
 	{
-		if (!isset($this->storage->$bucket) || isset($this->storage->$bucket->$key))
-			return false;
-		
-		unset($this->storage->$bucket->$key);
-		
-		return true;
+		return $this->storage->removeKey($bucket, $key);
 	}
 }

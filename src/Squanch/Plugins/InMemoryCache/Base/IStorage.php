@@ -9,11 +9,11 @@ interface IStorage
 {
 	public function storage(): array;
 	
-	public function hasBucket(string $bucket);
-	public function hasKey(string $bucket, string $key);
+	public function hasBucket(string $bucket): bool;
+	public function hasKey(string $bucket, string $key): bool;
 	
-	public function removeBucket(string $bucket);
-	public function removeKey(string $bucket, string $key);
+	public function removeBucket(string $bucket): bool;
+	public function removeKey(string $bucket, string $key): bool;
 
 	/**
 	 * @param string $bucket
@@ -28,5 +28,5 @@ interface IStorage
 	 */
 	public function getItemIfExists(string $bucket, string $key);
 	
-	public function setItem(Data $item); 
+	public function setItem(Data $item): bool; 
 }
