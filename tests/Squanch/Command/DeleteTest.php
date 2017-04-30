@@ -2,22 +2,18 @@
 namespace Squanch\Command;
 
 
-use Squanch\Base\ICachePlugin;
 use Squanch\Exceptions\OperationNotSupportedOnBucketException;
-
-use dummyStorage\Config;
 
 
 class DeleteTest extends \PHPUnit_Framework_TestCase
 {
-	/** @var ICachePlugin */
-	private $cache;
+	use \Squanch\TSanityTest;
 	
 	
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->cache = (new Config())->getPlugin();
+		$this->loadPlugin();
 	}
 	
 	

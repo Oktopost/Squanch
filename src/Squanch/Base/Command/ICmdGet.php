@@ -36,7 +36,7 @@ interface ICmdGet extends IWhere, IResetTTL, IGetEventProvider
 	public function asString();
 	
 	/**
-	 * @return Data|bool
+	 * @return Data|null
 	 */
 	public function asData();
 }

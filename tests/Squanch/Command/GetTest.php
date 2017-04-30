@@ -2,23 +2,21 @@
 namespace Squanch\Command;
 
 
-use Squanch\Base\ICachePlugin;
 use Squanch\Objects\Data;
+
 use Objection\LiteSetup;
 use Objection\LiteObject;
-use dummyStorage\Config;
 
 
 class GetTest extends \PHPUnit_Framework_TestCase
 {
-	/** @var ICachePlugin */
-	private $cache;
+	use \Squanch\TSanityTest;
 	
 	
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->cache = (new Config())->getPlugin();
+		$this->loadPlugin();
 	}
 	
 	
@@ -32,10 +30,10 @@ class GetTest extends \PHPUnit_Framework_TestCase
 		$this->cache->delete('a')->execute();
 	}
 	
-	public function test_get_by_key_return_false()
+	public function test_get_by_key_return_null()
 	{
 		$get = $this->cache->get()->byKey('fake');
-		self::assertFalse($get->asData());
+		self::assertNull($get->asData());
 	}
 	
 	public function test_resetTTL_will_update_ttl()

@@ -89,8 +89,11 @@ abstract class AbstractGet implements ICmdGet
 			return null;
 		
 		$data = json_decode($data->Value, false);
-		// TODO: Throw exception if not object
-		return is_object($data) ? $data : null;
+		
+		if (!is_object($data))
+			throw new \Exception('Data must be a valid json!');
+		
+		return $data;
 	}
 
 	/**

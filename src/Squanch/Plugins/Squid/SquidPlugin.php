@@ -10,6 +10,7 @@ use Squanch\Base\Command\ICmdDelete;
 use Squanch\Objects\Data;
 use Squanch\Plugins\AbstractPlugin;
 
+use Squid\MySql;
 use Squid\MySql\IMySqlConnector;
 use Squid\MySql\Impl\Connectors\MySqlObjectConnector;
 
@@ -41,11 +42,23 @@ class SquidPlugin extends AbstractPlugin implements ICachePlugin
 	{
 		return (new Command\Delete())->setConnector($this->connector)->setTableName($this->table);
 	}
-	
-	
-	public function __construct(IMySqlConnector $connection, string $table)
+
+
+	/**
+	 * SquidPlugin constructor.
+	 * @param IMySqlConnector|array $connection
+	 * @param string $table
+	 */
+	public function __construct($connection, string $table)
 	{
 		parent::__construct();
+		
+		if (is_array($connection))
+		{
+			$mysql = new MySql();
+			$mysql->config()->addConfig('main', $connection);
+			$connection = $mysql->getConnector('main');
+		}
 		
 		$this->table = $table;
 		$this->connector = new MySqlObjectConnector();

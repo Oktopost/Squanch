@@ -1,12 +1,14 @@
 #!/bin/bash
 
-INSTANCES=(squid predis);
+./vendor/bin/phpunit --testsuite=Squanch_Unit_Tests
+
+INSTANCES=(squid predis inmemory fallback fallback-advanced);
 
 for i in ${INSTANCES[@]}; do
-	export instance=$i;
+	export CACHE_PLUGIN_TYPE=$i;
 	echo ;
 	echo "==========================================";
 	echo "Testing with $i implementer";
 	echo "==========================================";
-	./vendor/bin/phpunit tests
+	./vendor/bin/phpunit --testsuite=Squanch_Sanity_Tests
 done

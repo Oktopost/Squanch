@@ -1,9 +1,9 @@
 <phpunit bootstrap="tests/boot.php">
     <testsuites>
-        <testsuite name="SquanchSanity">
+        <testsuite name="Squanch_Sanity_Tests">
             <directory>tests</directory>
         </testsuite>
-        <testsuite name="Squanch">
+        <testsuite name="Squanch_Unit_Tests">
             <directory>unitests</directory>
         </testsuite>
     </testsuites>

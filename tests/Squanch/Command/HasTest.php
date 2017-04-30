@@ -2,20 +2,15 @@
 namespace Squanch\Command;
 
 
-use Squanch\Base\ICachePlugin;
-use dummyStorage\Config;
-
-
 class HasTest extends \PHPUnit_Framework_TestCase
 {
-	/** @var ICachePlugin */
-	private $cache;
+	use \Squanch\TSanityTest;
 	
 	
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->cache = (new Config())->getPlugin();
+		$this->loadPlugin();
 	}
 	
 	

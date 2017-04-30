@@ -2,24 +2,20 @@
 namespace Squanch\Command;
 
 
-use dummyStorage\Config;
 use PHPUnit_Framework_TestCase;
 use Squanch\Base\ICachePlugin;
 use Squanch\Enum\TTL;
-use Squanch\Objects\CallbackData;
-use Squanch\Objects\Data;
 
 
 class SetTest extends PHPUnit_Framework_TestCase
 {
-	/** @var ICachePlugin */
-	private $cache;
+	use \Squanch\TSanityTest;
 	
 	
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->cache = (new Config())->getPlugin();
+		$this->loadPlugin();
 	}
 	
 	
