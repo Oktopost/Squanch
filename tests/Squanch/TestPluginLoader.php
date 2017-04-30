@@ -16,9 +16,12 @@ class TestPluginLoader
 	private static function getSquid(): ICachePlugin
 	{
 		return new SquidPlugin([
-			'user'	=> 'root',
-			'pass'	=> '',
-			'db'	=> 'squanch_cache'
+			'user'		=> 'root',
+			'scheme'	=> 'tcp',
+			'host'		=> '127.0.0.1',
+			'port'		=> 3306,
+			'pass'		=> '',
+			'db'		=> 'squanch_cache'
 		], 'HardCache');
 	}
 	
