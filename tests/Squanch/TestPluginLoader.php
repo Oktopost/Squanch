@@ -6,6 +6,7 @@ use Squanch\Base\ICachePlugin;
 use Squanch\Plugins\Squid\SquidPlugin;
 use Squanch\Plugins\Predis\PredisPlugin;
 use Squanch\Plugins\Fallback\FallbackPlugin;
+use Squanch\Plugins\LRUCache\LRUCachePlugin;
 use Squanch\Plugins\InMemoryCache\InMemoryPlugin;
 
 use Predis\Client;
@@ -52,6 +53,11 @@ class TestPluginLoader
 		]);
 	}
 	
+	private static function getLRUCache(): ICachePlugin
+	{
+		return new LRUCachePlugin(10);
+	}
+	
 	
 	public static function get(): ICachePlugin
 	{	
@@ -71,6 +77,9 @@ class TestPluginLoader
 				
 			case 'fallback-advanced':
 				return self::getComplexFallback();
+			
+			case 'lrucache':
+				return self::getLRUCache();
 				
 			default:
 				throw new \Exception('Set CACHE_PLUGIN_TYPE to run sanity tests');

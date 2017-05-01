@@ -2,7 +2,7 @@
 
 ./vendor/bin/phpunit --testsuite=Squanch_Unit_Tests
 
-INSTANCES=(squid predis inmemory fallback fallback-advanced);
+INSTANCES=(squid predis inmemory fallback fallback-advanced lrucache);
 
 for i in ${INSTANCES[@]}; do
 	export CACHE_PLUGIN_TYPE=$i;
