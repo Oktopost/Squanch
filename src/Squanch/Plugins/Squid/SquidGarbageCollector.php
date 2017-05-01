@@ -21,8 +21,9 @@ class SquidGarbageCollector
 	{
 		return $this->connector
 			->delete()
+			->from($this->tableName)
+			->where('EndDate < ?', date('c', $this->date))
 			->limitBy($this->limitPerIteration)
-			->where('EndDate < ?', strtotime($this->date))
 			->executeDml(true);
 	}
 
