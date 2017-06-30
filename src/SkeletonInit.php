@@ -1,10 +1,13 @@
 <?php
+namespace Squanch;
+
 
 use Skeleton\Skeleton;
+use Skeleton\Base\ISkeletonInit;
 use Skeleton\ConfigLoader\PrefixDirectoryConfigLoader;
 
 
-class Squanch
+class SkeletonInit implements ISkeletonInit
 {
 	/** @var Skeleton */
 	private static $skeleton = null;
@@ -23,7 +26,7 @@ class Squanch
 	}
 	
 	
-	public static function skeleton(string $item = null)
+	public static function skeleton(?string $item = null)
 	{
 		if (!self::$skeleton)
 			self::setUp();

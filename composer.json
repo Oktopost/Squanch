@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "oktopost/skeleton": "^1.0",
+        "php": ">=7.1",
+        "oktopost/skeleton": "^1.0.10",
         "oktopost/objection": "^1.0"
     },
     "require-dev": {
@@ -31,12 +31,10 @@
     },
     "autoload-dev": {
         "psr-0": {
-            "Tests": "tests",
-            "dummyStorage": "tests/dummyStorage"
+            "Tests": "tests"
         },
         "psr-4": {
-            "Tests\\": "tests/",
-            "dummyStorage\\": "tests/dummyStorage/"
+            "Tests\\": "tests/"
         }
     },
     "scripts": {

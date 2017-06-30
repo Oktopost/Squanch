@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7cf506806b21fab1da1ef8d1cc536d3a",
+    "content-hash": "2d3c7bd3342f95783e95289611aca71e",
     "packages": [
         {
             "name": "oktopost/objection",
@@ -56,21 +56,24 @@
         },
         {
             "name": "oktopost/skeleton",
-            "version": "1.0.9",
+            "version": "1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Oktopost/Skeleton.git",
-                "reference": "fe10a5a0377b908cab9d9d13d66ada3a57187659"
+                "reference": "34f42cb18ce60adcfa030ff539c704a36b2a5569"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Oktopost/Skeleton/zipball/fe10a5a0377b908cab9d9d13d66ada3a57187659",
-                "reference": "fe10a5a0377b908cab9d9d13d66ada3a57187659",
+                "url": "https://api.github.com/repos/Oktopost/Skeleton/zipball/34f42cb18ce60adcfa030ff539c704a36b2a5569",
+                "reference": "34f42cb18ce60adcfa030ff539c704a36b2a5569",
                 "shasum": ""
             },
             "require": {
                 "oktopost/objection": "^1.0.0",
-                "php": ">=5.5"
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.3.3"
             },
             "type": "library",
             "autoload": {
@@ -91,7 +94,7 @@
             ],
             "description": "Inversion of Control library",
             "homepage": "https://github.com/Oktopost/Skeleton",
-            "time": "2017-02-20T06:46:22+00:00"
+            "time": "2017-06-28T13:58:49+00:00"
         }
     ],
     "packages-dev": [
@@ -1945,7 +1948,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.0"
+        "php": ">=7.1"
     },
     "platform-dev": []
 }
