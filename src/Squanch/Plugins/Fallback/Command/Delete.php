@@ -17,7 +17,15 @@ class Delete extends AbstractDelete implements IFallbackPluginCommand
 		
 		foreach ($this->getPlugins() as $plugin)
 		{
-			$result = $plugin->delete()->byBucket($bucket)->execute() || $result;
+			try
+			{
+				$result = $plugin->delete()->byBucket($bucket)->execute() || $result;
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $bucket);
+				continue;
+			}
 		}
 		
 		return $result;
@@ -29,7 +37,15 @@ class Delete extends AbstractDelete implements IFallbackPluginCommand
 		
 		foreach ($this->getPlugins() as $plugin)
 		{
-			$result = $plugin->delete($key, $bucket)->execute() || $result;
+			try
+			{
+				$result = $plugin->delete($key, $bucket)->execute() || $result;
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $bucket, $key);
+				continue;
+			}
 		}
 		
 		return $result;

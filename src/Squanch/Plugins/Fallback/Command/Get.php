@@ -21,7 +21,15 @@ class Get extends AbstractGet implements IFallbackPluginCommand
 	{
 		foreach ($this->getPlugins() as $plugin)
 		{
-			$obj = $plugin->get($data->Key, $data->Bucket)->asData();
+			try
+			{
+				$obj = $plugin->get($data->Key, $data->Bucket)->asData();
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Key);
+				continue;
+			}
 			
 			if ($obj)
 			{
@@ -36,7 +44,15 @@ class Get extends AbstractGet implements IFallbackPluginCommand
 	{
 		foreach ($this->_plugins as $plugin)
 		{
-			$plugin->has($data->Key, $data->Bucket)->resetTTL($ttl)->check();
+			try
+			{
+				$plugin->has($data->Key, $data->Bucket)->resetTTL($ttl)->check();
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Key);
+				continue;
+			}
 		}
 	}
 }

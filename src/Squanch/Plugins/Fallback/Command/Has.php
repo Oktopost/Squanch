@@ -16,9 +16,17 @@ class Has extends AbstractHas implements IFallbackPluginCommand
 	{
 		foreach ($this->_plugins as $plugin)
 		{
-			if ($plugin->has($data->Key, $data->Bucket)->check())
+			try
 			{
-				return true;
+				if ($plugin->has($data->Key, $data->Bucket)->check())
+				{
+					return true;
+				}
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Key);
+				continue;
 			}
 		}
 		
@@ -29,7 +37,15 @@ class Has extends AbstractHas implements IFallbackPluginCommand
 	{
 		foreach ($this->_plugins as $plugin)
 		{
-			$plugin->has($data->Key, $data->Bucket)->resetTTL($ttl)->check();
+			try
+			{
+				$plugin->has($data->Key, $data->Bucket)->resetTTL($ttl)->check();
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Key);
+				continue;
+			}
 		}
 	}
 }

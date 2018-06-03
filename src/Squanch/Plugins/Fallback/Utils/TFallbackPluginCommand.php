@@ -9,6 +9,9 @@ trait TFallbackPluginCommand
 {
 	/** @var ICachePlugin[] */
 	private $_plugins;
+	
+	/** @var IFallbackPluginExceptionHandler */
+	private $onFallbackHandler;
 
 
 	/**
@@ -19,6 +22,14 @@ trait TFallbackPluginCommand
 		return $this->_plugins;
 	}
 	
+	protected function onFallback(\Throwable $t, string $bucket, ?string $key = null)
+	{
+		if (!$this->onFallbackHandler)
+			return;
+		
+		$this->onFallbackHandler->onFail($t, $bucket, $key);
+	}
+	
 	
 	/**
 	 * @param ICachePlugin[] $plugins
@@ -27,6 +38,18 @@ trait TFallbackPluginCommand
 	public function setPlugins(array $plugins): IFallbackPluginCommand
 	{
 		$this->_plugins = $plugins;
+		return $this;
+	}
+	
+	/**
+	 * @param null|IFallbackPluginExceptionHandler $handler
+	 * @return static
+	 */
+	public function setOnFallback(?IFallbackPluginExceptionHandler $handler = null)
+	{
+		if ($handler)
+			$this->onFallbackHandler = $handler;
+		
 		return $this;
 	}
 }

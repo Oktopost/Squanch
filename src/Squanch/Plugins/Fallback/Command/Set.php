@@ -27,7 +27,15 @@ class Set extends AbstractSet implements IFallbackPluginCommand
 		
 		foreach ($this->_plugins as $plugin)
 		{
-			$result = $this->setDataForPlugin($plugin, $data)->insert() || $result;
+			try
+			{
+				$result = $this->setDataForPlugin($plugin, $data)->insert() || $result;
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Id);
+				continue;
+			}
 		}
 		
 		return $result;
@@ -39,7 +47,15 @@ class Set extends AbstractSet implements IFallbackPluginCommand
 		
 		foreach ($this->_plugins as $plugin)
 		{
-			$result = $this->setDataForPlugin($plugin, $data)->update() || $result;
+			try
+			{
+				$result = $this->setDataForPlugin($plugin, $data)->update() || $result;
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Id);
+				continue;
+			}
 		}
 		
 		return $result;
@@ -51,7 +67,15 @@ class Set extends AbstractSet implements IFallbackPluginCommand
 		
 		foreach ($this->_plugins as $plugin)
 		{
-			$result = $this->setDataForPlugin($plugin, $data)->save() || $result;
+			try
+			{
+				$result = $this->setDataForPlugin($plugin, $data)->save() || $result;
+			}
+			catch (\Throwable $t)
+			{
+				$this->onFallback($t, $data->Bucket, $data->Id);
+				continue;
+			}
 		}
 		
 		return $result;
